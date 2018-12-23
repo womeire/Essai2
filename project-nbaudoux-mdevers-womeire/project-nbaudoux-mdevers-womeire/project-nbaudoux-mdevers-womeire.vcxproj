@@ -160,6 +160,7 @@
     <ClInclude Include="InputStream02.h" />
     <ClInclude Include="InputStream03.h" />
     <ClInclude Include="InputStream04.h" />
+    <ClInclude Include="Multiway.h" />
     <ClInclude Include="OutputStream01.h" />
     <ClInclude Include="OutputStream02.h" />
     <ClInclude Include="OutputStream03.h" />
@@ -172,6 +173,7 @@
     <ClCompile Include="InputStream02.cpp" />
     <ClCompile Include="InputStream03.cpp" />
     <ClCompile Include="InputStream04.cpp" />
+    <ClCompile Include="Multiway.cpp" />
     <ClCompile Include="OutputStream01.cpp" />
     <ClCompile Include="OutputStream02.cpp" />
     <ClCompile Include="OutputStream03.cpp" />

@@ -45,6 +45,9 @@
     <ClInclude Include="InputStream04.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Multiway.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -78,6 +81,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InputStream04.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Multiway.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
