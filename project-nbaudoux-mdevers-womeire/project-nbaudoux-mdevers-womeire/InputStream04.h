@@ -7,14 +7,17 @@ class InputStream04
 public:
 	InputStream04();
 	~InputStream04();
-	void open(string, int); 
+	void open(string, int, int); 
 	int32_t read_next();
+	bool end_of_stream();
 private:
+	int fileSize;
 	int bufferSize;
 	int currentPos;
 	int currentPosInBuffer;
-	boost::interprocess::file_mapping m_file;
-	boost::interprocess::mapped_region region;
+	char filepathChar[_MAX_PATH];
+	int32_t * memAddress;
+	std::vector<int32_t> buffer;
 	void LoadNextBuffer();
 };
 

@@ -14,34 +14,73 @@ InputStream04::~InputStream04()
 	//boost::interprocess::file_mapping::remove(filepath);
 }
 
-void InputStream04::open(string filepath, int bufSize)
+void InputStream04::open(string filepath, int bufSize, int fSize) // have third argument for size?
 {
 	bufferSize = bufSize;
-	char filepathChar[_MAX_PATH];
-	strcpy_s(filepathChar, filepath.c_str());
+	fileSize = fSize;
 
-	boost::interprocess::file_mapping::remove(filepathChar); // check if it's done the way it should
-	
-	//Create a file mapping
-	boost::interprocess::file_mapping m_file(filepathChar, boost::interprocess::read_only);
+	strcpy_s(filepathChar, filepath.c_str());
+	buffer.resize(bufferSize);
+
+	//boost::interprocess::file_mapping::remove(filepathChar); // check if it's done the way it should
+
+	try
+	{
+		//Create a file mapping
+		boost::interprocess::file_mapping m_file(filepathChar, boost::interprocess::read_only);
+
+		//m_file2 = m_file;
+		auto test = m_file.get_mode();
+	}
+	catch (const boost::interprocess::interprocess_exception e)
+	{
+		e;
+	}
 
 }
 
 int32_t InputStream04::read_next()
 {
+	currentPos++;
+
 	if (currentPosInBuffer % bufferSize == 0) {
+		if (end_of_stream())
+			return NULL; // Todo not good as -1 can be a correct value for this function... but everything from min to max is...
 		LoadNextBuffer();
 		currentPosInBuffer = 0;
 	}
 
-	void * address = region.get_address();
+	return buffer[currentPosInBuffer++]; //equivalent to "int32_t val = buffer[currentPosInBuffer]; ++currentPosInBuffer;return val;"
+}
 
-	return 0;
+bool InputStream04::end_of_stream()
+{
+	return currentPos >= fileSize;
 }
 
 void InputStream04::LoadNextBuffer()
 {
-	currentPos++;
-	//Map the whole file with read-write permissions in this process
-	boost::interprocess::mapped_region region(m_file, boost::interprocess::read_only, currentPos , bufferSize);
+
+	try
+	{
+		//Create a file mapping
+		boost::interprocess::file_mapping m_file(filepathChar, boost::interprocess::read_only);
+
+		//Map the whole file with read-write permissions in this process
+		boost::interprocess::mapped_region region(m_file, boost::interprocess::read_only, currentPos*4, bufferSize*4); // bufferSize is converted to size_t which is 4 bytes
+
+		//auto test = region.get_page_size(); // = 65536
+
+		memAddress = (int32_t*)region.get_address();
+		for (int32_t i = 0; i < bufferSize; i++)
+		{
+			buffer[i] = *(memAddress + i);
+		}
+	}
+	catch (const boost::interprocess::interprocess_exception e)
+	{
+		e;
+	}
+
+
 }
