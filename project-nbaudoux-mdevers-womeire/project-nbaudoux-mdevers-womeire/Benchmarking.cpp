@@ -4,6 +4,11 @@
 
 Benchmarking::Benchmarking()
 {
+	average = 0;
+	nbObs = 0;
+	highest = 0;
+	lowest = 9999;
+	started = false;
 }
 
 
@@ -13,16 +18,56 @@ Benchmarking::~Benchmarking()
 
 void Benchmarking::startTest()
 {
-	start = boost::chrono::steady_clock::now();
+	if (!started) {
+		start = boost::chrono::steady_clock::now();
+		started = true;
+	}
 }
 
 void Benchmarking::stopTest()
 {
-	stop = boost::chrono::steady_clock::now();
-	diff = stop - start;
+	if (started) {
+		stop = boost::chrono::steady_clock::now();
+		started = false;
+		diff = stop - start;
+		nbObs++;
+		average += diff.count();
+		setLowest(diff.count());
+		setHighest(diff.count());
+	}
+	else {
+		std::cout << "Test not started yet" << std::endl;
+	}
 }
 
-boost::chrono::duration<double, boost::milli> Benchmarking::getPerformance()
+void Benchmarking::setLowest(double val) {
+	if (val < lowest)
+		lowest = val;
+}
+
+void Benchmarking::setHighest(double val) {
+	if (val > highest)
+		highest = val;
+}
+
+double Benchmarking::getLowest() {
+	return lowest;
+}
+
+double Benchmarking::getHighest() {
+	return highest;
+}
+
+double Benchmarking::getLastPerformance()
 {
-	return diff;
+	if (started) {
+		std::cout << "Be aware that a test is currently running. The displayed value, is the value of the previous observation" << std::endl;
+	}
+	return diff.count();
+}
+
+double Benchmarking::getAvgPerformance()
+{
+	double res = average / nbObs;
+	return res;
 }

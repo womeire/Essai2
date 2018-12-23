@@ -11,7 +11,9 @@ InputStream01::InputStream01()
 InputStream01::~InputStream01()
 {
 	printf("File Handle %d closed.\n", fileHandle);
-	_close(fileHandle);
+	//Error here. It seems that parameter not valid
+	//int res = _close(fileHandle);
+	//std::cout << "Close return value : " << res << std::endl;
 }
 
 /*Tries to open a file with the given filepath (read-only). Returns the filehandle as an int*/
