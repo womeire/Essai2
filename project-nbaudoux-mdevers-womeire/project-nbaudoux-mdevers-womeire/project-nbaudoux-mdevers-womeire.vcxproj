@@ -108,10 +108,12 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\boost\boost_1_68_0</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Program Files (x86)\boost\boost_1_68_0\stage\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -158,6 +160,7 @@
     <ClInclude Include="InputStream02.h" />
     <ClInclude Include="InputStream03.h" />
     <ClInclude Include="InputStream04.h" />
+    <ClInclude Include="Multiway.h" />
     <ClInclude Include="OutputStream01.h" />
     <ClInclude Include="OutputStream02.h" />
     <ClInclude Include="OutputStream03.h" />
@@ -170,6 +173,7 @@
     <ClCompile Include="InputStream02.cpp" />
     <ClCompile Include="InputStream03.cpp" />
     <ClCompile Include="InputStream04.cpp" />
+    <ClCompile Include="Multiway.cpp" />
     <ClCompile Include="OutputStream01.cpp" />
     <ClCompile Include="OutputStream02.cpp" />
     <ClCompile Include="OutputStream03.cpp" />
