@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2050
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "project-nbaudoux-mdevers-womeire", "project-nbaudoux-mdevers-womeire\project-nbaudoux-mdevers-womeire.vcxproj", "{4AE15897-7DFB-4467-A8E8-193AA50A0269}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EA64CEF5-DCC5-4654-B719-50B858BC5212}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\..\..\..\Program Files (x86)\Boost\boost_1_68_0\bin.v2\libs\chrono\build\msvc-14.1\debug\link-static\threading-multi\libboost_chrono-vc141-mt-gd-x32-1_68.lib = ..\..\..\..\..\..\Program Files (x86)\Boost\boost_1_68_0\bin.v2\libs\chrono\build\msvc-14.1\debug\link-static\threading-multi\libboost_chrono-vc141-mt-gd-x32-1_68.lib
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4AE15897-7DFB-4467-A8E8-193AA50A0269}.Debug|x64.ActiveCfg = Debug|x64
+		{4AE15897-7DFB-4467-A8E8-193AA50A0269}.Debug|x64.Build.0 = Debug|x64
+		{4AE15897-7DFB-4467-A8E8-193AA50A0269}.Debug|x86.ActiveCfg = Debug|Win32
+		{4AE15897-7DFB-4467-A8E8-193AA50A0269}.Debug|x86.Build.0 = Debug|Win32
+		{4AE15897-7DFB-4467-A8E8-193AA50A0269}.Release|x64.ActiveCfg = Release|x64
+		{4AE15897-7DFB-4467-A8E8-193AA50A0269}.Release|x64.Build.0 = Release|x64
+		{4AE15897-7DFB-4467-A8E8-193AA50A0269}.Release|x86.ActiveCfg = Release|Win32
+		{4AE15897-7DFB-4467-A8E8-193AA50A0269}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3EC8E743-CD42-417E-8D03-25F397FFBD9D}
+	EndGlobalSection
+EndGlobal
