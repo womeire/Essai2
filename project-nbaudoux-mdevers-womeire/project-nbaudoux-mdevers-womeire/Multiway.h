@@ -12,7 +12,7 @@ class Multiway
 public:
 	Multiway(std::vector<std::string>);
 	void read();
-	void merge();
+	std::vector<int> merge();
 	void showRes();
 	~Multiway();
 };
