@@ -1,15 +1,16 @@
 #include <string>
+#include "Benchmarking.h"
 using namespace std;
 namespace bi = boost::interprocess;
 
 #pragma once
-class InputStream04
+class InputStream04Bis
 {
 public:
-	InputStream04();
-	~InputStream04();
-	void open(string, int); 
-	int32_t * read_next();
+	InputStream04Bis();
+	~InputStream04Bis();
+	bi::file_mapping open(string, int);
+	int32_t read_next(bi::file_mapping);
 	bool end_of_stream();
 private:
 	int fileSize_32;
