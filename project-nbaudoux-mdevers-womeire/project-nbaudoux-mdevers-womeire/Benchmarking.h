@@ -5,7 +5,7 @@ class Benchmarking
 {
 	boost::chrono::steady_clock::time_point start, stop;
 	boost::chrono::duration <double, boost::milli> diff;
-	double average, highest, lowest;
+	double average, highest, lowest, total;
 	std::size_t nbObs;
 	bool started;
 public:
@@ -18,6 +18,7 @@ public:
 	double getHighest();
 	double getLastPerformance();
 	double getAvgPerformance();
+	double getTotalTime();
 	~Benchmarking();
 };
 
