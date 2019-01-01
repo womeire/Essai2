@@ -11,12 +11,14 @@ InputStream01::InputStream01()
 InputStream01::~InputStream01()
 {
 	_close(fileHandle);
+	fileHandle = -1;
 }
 
 /*Tries to open a file with the given filepath (read-only). Returns the filehandle as an int*/
 void InputStream01::open(string filepath)
 {
 	if (fileHandle != -1) {
+		printf("This InputStream01 already opened a file");
 		return;
 	}
 

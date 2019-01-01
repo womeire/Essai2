@@ -10,6 +10,7 @@ OutputStream01::OutputStream01()
 
 OutputStream01::~OutputStream01()
 {
+	close();
 }
 
 void OutputStream01::create(string filepath) // todo for the moment does overwrite as far as it writes data -> previous files can still be visible -> erase file if already exists
@@ -27,8 +28,6 @@ void OutputStream01::create(string filepath) // todo for the moment does overwri
 		printf("Error opening the stream: %d %d\n", error, fileHandle);
 		return;
 	}
-
-	printf("File \"%s\" created successfully. It's handle is %d.\n", fp, fileHandle);
 }
 
 void OutputStream01::write(int32_t element)
@@ -50,4 +49,5 @@ void OutputStream01::write(int32_t element)
 void OutputStream01::close()
 {
 	_close(fileHandle);
+	fileHandle = -1;
 }
