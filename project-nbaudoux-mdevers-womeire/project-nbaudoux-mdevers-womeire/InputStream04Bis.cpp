@@ -34,18 +34,9 @@ void InputStream04Bis::open(string filepath, int bufSize)
 
 int InputStream04Bis::read_next()
 {
-	/*try
-	{
-		bi::file_mapping m_file(filepathChar, bi::read_only);
-		bi::mapped_region region(m_file, bi::read_only, currentPos_8, bufferSize_8);
-	}
-	catch (const bi::interprocess_exception e)
-	{
-		e;
-	}*/
 	int startingPos = currentPos_8;
 
-	currentPos_8 += bufferSize_8;
+	currentPos_8 += bufferSize_8; // todo something to take into account "incomplete" last buffer with fileSize_8 & currentPos_8
 
 	return startingPos;
 }
