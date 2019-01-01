@@ -52,7 +52,7 @@ void OutputStream04Bis::write(int32_t * elements)
 
 	int32_t* memAddressOut = (int32_t*)region.get_address();
 
-	memcpy(elements, memAddressOut, sizeof(int32_t)*bufferSize);
+	memcpy(memAddressOut, elements, sizeof(int32_t)*bufferSize);
 }
 
 void OutputStream04Bis::close()
