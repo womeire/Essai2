@@ -10,15 +10,16 @@ OutputStream03::OutputStream03()
 
 OutputStream03::~OutputStream03()
 {
-	fclose(filePointer);
+	close();
 }
 
-void OutputStream03::create(string filepath, int bufSize)
+void OutputStream03::create(string filepath, int bfSize)
 {
 	if (filePointer != NULL) {
 		printf("Stream already in use.\n");
 		return;
 	}
+	bufferSize = bfSize;
 
 	char filepathChar[_MAX_PATH];
 	strcpy_s(filepathChar, filepath.c_str());
@@ -28,31 +29,22 @@ void OutputStream03::create(string filepath, int bufSize)
 		printf("Error opening the stream: %d \n \"%s\"\n", error, filepathChar);
 		return;
 	}
-
-	bufferSize = bufSize;
 }
 
-void OutputStream03::write(int32_t * elements)
+void OutputStream03::write(int32_t* element)
 {
 	if (filePointer == NULL) {
 		printf("File not yet created. Call the create function first.\n");
 		return;
 	}
 
-	fwrite(elements, sizeof(int32_t), bufferSize, filePointer);
-}
-
-void OutputStream03::write(int32_t * elements, int size)
-{
-	if (filePointer == NULL) {
-		printf("File not yet created. Call the create function first.\n");
-		return;
-	}
-
-	fwrite(elements, sizeof(int32_t), size, filePointer);
+	fwrite(element, sizeof(int32_t), bufferSize, filePointer);
 }
 
 void OutputStream03::close()
 {
-	fclose(filePointer);
+	if (filePointer != NULL) {
+		fclose(filePointer);
+		filePointer = NULL;
+	}
 }
