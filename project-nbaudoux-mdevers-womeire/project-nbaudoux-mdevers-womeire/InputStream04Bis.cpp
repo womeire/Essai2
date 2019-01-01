@@ -36,7 +36,7 @@ void InputStream04Bis::open(string filepath, int bfSize)
 int32_t* InputStream04Bis::read_next()
 {
 	bi::file_mapping m_file(filepathChar, bi::read_only);
-	bi::mapped_region region(m_file, bi::read_only, currentPos * 4, bufferSize * 4);
+	bi::mapped_region region(m_file, bi::read_only, currentPos * sizeof(int32_t), bufferSize * sizeof(int32_t));
 
 	currentPos += bufferSize; // todo still need to check eof
 

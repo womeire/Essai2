@@ -42,27 +42,17 @@ void OutputStream04Bis::create(string filepath, int bufSize, int fS_32)
 
 void OutputStream04Bis::write(int32_t * elements)
 {
-	try
-	{
-		//Create a file mapping;
-		bi::file_mapping m_file(filepathChar, bi::read_write);
+	//Create a file mapping;
+	bi::file_mapping m_file(filepathChar, bi::read_write);
 
-		//Map the whole file with read-only permissions in this process
-		bi::mapped_region region(m_file, bi::read_write, currentPos * 4, bufferSize * 4);
+	//Map the whole file with read-only permissions in this process
+	bi::mapped_region region(m_file, bi::read_write, currentPos * sizeof(int32_t), bufferSize * sizeof(int32_t));
 
-		currentPos += bufferSize; //increment size
+	currentPos += bufferSize; //increment size
 
-		int32_t* memAddressOut = (int32_t*)region.get_address();
+	int32_t* memAddressOut = (int32_t*)region.get_address();
 
-		for (int32_t i = 0; i < bufferSize; i++) // todo does it need to be in a "for" loop? Cant i giva a range and it copies all?
-		{
-			*(memAddressOut + i) = *(elements + i);
-		}
-	}
-	catch (const bi::interprocess_exception e)
-	{
-		e;
-	}
+	memcpy(elements, memAddressOut, sizeof(int32_t)*bufferSize);
 }
 
 void OutputStream04Bis::close()
