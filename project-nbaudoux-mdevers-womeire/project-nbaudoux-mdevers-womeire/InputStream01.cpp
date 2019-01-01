@@ -4,20 +4,22 @@
 
 InputStream01::InputStream01()
 {
-	fileHandle = -1;
+	fileHandle = NULL;
 }
 
 
 InputStream01::~InputStream01()
 {
-	_close(fileHandle);
-	fileHandle = -1;
+	if (fileHandle != NULL) {
+		_close(fileHandle);
+		fileHandle = NULL;
+	}
 }
 
 /*Tries to open a file with the given filepath (read-only). Returns the filehandle as an int*/
 void InputStream01::open(string filepath)
 {
-	if (fileHandle != -1) {
+	if (fileHandle != NULL) {
 		printf("This InputStream01 already opened a file");
 		return;
 	}
@@ -39,10 +41,10 @@ int32_t InputStream01::read_next()
 		return NULL;
 	}
 
-	uint8_t buffer[sizeof(int32_t)];
-	_read(fileHandle, buffer, sizeof(int32_t));
+	uint8_t elements[sizeof(int32_t)];
+	_read(fileHandle, elements, sizeof(int32_t));
 
-	return buffer[3] << 24 | buffer[2] << 16 | buffer[1] << 8 | buffer[0];
+	return elements[3] << 24 | elements[2] << 16 | elements[1] << 8 | elements[0];
 }
 
 bool InputStream01::end_of_stream()
