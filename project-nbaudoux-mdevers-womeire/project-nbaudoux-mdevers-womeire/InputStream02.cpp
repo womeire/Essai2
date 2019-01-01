@@ -36,6 +36,11 @@ void InputStream02::open(string filepath)
 	rewind(filePointer);
 
 	// allocate memory to buffer to contain the whole file:
+	std::size_t buffSize;
+	if(sizeof(int32_t)*fileSize_32 >= _HEAP_MAXREQ)
+		//if too large error will be catched later
+		printf("File is too large");
+
 	buffer = (int32_t*)malloc(sizeof(int32_t)*fileSize_32);
 	if (buffer == NULL) {
 		printf("Error allocating memory to buffer.\n");
