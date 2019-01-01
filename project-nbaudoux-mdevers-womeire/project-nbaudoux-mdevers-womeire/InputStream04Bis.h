@@ -9,8 +9,8 @@ class InputStream04Bis
 public:
 	InputStream04Bis();
 	~InputStream04Bis();
-	bi::file_mapping open(string, int);
-	int32_t read_next(bi::file_mapping);
+	void open(string, int);
+	int32_t* read_next();
 	bool end_of_stream();
 private:
 	int fileSize_32;

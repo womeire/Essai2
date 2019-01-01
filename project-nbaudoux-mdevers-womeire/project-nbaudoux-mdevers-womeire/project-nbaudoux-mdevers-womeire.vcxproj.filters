@@ -60,6 +60,9 @@
     <ClInclude Include="OutputStream02Bis.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OutputStream04Bis.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -108,6 +111,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OutputStream02Bis.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OutputStream04Bis.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

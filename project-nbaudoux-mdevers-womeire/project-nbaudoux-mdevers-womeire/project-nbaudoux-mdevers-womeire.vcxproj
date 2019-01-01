@@ -168,6 +168,7 @@
     <ClInclude Include="OutputStream02Bis.h" />
     <ClInclude Include="OutputStream03.h" />
     <ClInclude Include="OutputStream04.h" />
+    <ClInclude Include="OutputStream04Bis.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RandomFileCreation.h" />
   </ItemGroup>
@@ -185,6 +186,7 @@
     <ClCompile Include="OutputStream02Bis.cpp" />
     <ClCompile Include="OutputStream03.cpp" />
     <ClCompile Include="OutputStream04.cpp" />
+    <ClCompile Include="OutputStream04Bis.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
