@@ -30,15 +30,13 @@ void OutputStream03::create(string filepath, int bufSize)
 	}
 
 	bufferSize = bufSize;
-
-	printf("File \"%s\" opened successfully.\n", filepathChar);
 }
 
 void OutputStream03::write(int32_t * elements)
 {
 	if (filePointer == NULL) {
 		printf("File not yet created. Call the create function first.\n");
-		return; // Todo real error?
+		return;
 	}
 
 	fwrite(elements, sizeof(int32_t), bufferSize, filePointer);
@@ -48,7 +46,7 @@ void OutputStream03::write(int32_t * elements, int size)
 {
 	if (filePointer == NULL) {
 		printf("File not yet created. Call the create function first.\n");
-		return; // Todo real error?
+		return;
 	}
 
 	fwrite(elements, sizeof(int32_t), size, filePointer);

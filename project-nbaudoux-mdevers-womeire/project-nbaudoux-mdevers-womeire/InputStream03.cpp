@@ -33,14 +33,16 @@ void InputStream03::open(string filepath, int bufSize)
 		return;
 	}
 
-	printf("File \"%s\" opened successfully.\n", filepathChar);
-
 	// obtain file size:
 	fseek(filePointer, 0, SEEK_END); // SEEK_END : Library implementations are allowed to not meaningfully support SEEK_END (therefore, code using it has no real standard portability).
 	fileSize_32 = ftell(filePointer) / 4; // divided by 4 because ftell returns the number of 8 bit units
 	rewind(filePointer);
 
 	bufferSize = bufSize;
+
+	if (sizeof(int32_t)*bufferSize >= _HEAP_MAXREQ)
+		// error will be catched later when initialising buffer
+		printf("File size is too large");
 
 	// allocate memory to buffer to contain the whole file:
 	buffer = (int32_t*)malloc(sizeof(int32_t)*bufferSize);
@@ -55,17 +57,15 @@ int32_t InputStream03::read_next()
 {
 	if (filePointer == NULL) {
 		printf("Invalid file or file not opened yet. \n");
-		return -1; // Todo not good as -1 can be a correct value for this function... but everything from min to max is...
+		return NULL;
 	}
 
 	if (++currentPos % bufferSize == 0) {
 		fread(buffer, sizeof(int32_t), bufferSize, filePointer);
 	}
 
-	//currentPos++;
-
 	if (currentPos >= fileSize_32) {
-		return -1; //todo same remark as just above
+		return NULL;
 	}
 
 	return buffer[currentPos % bufferSize];
@@ -75,7 +75,7 @@ bool InputStream03::end_of_stream()
 {
 	if (filePointer == NULL) {
 		printf("Invalid file or file not opened yet. \n");
-		return true; //todo return true or false?
+		return NULL;
 	}
 	return currentPos == fileSize_32;
 }
