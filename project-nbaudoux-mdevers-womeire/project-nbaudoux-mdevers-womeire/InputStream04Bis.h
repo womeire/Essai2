@@ -16,6 +16,8 @@ private:
 	int fileSize_8;
 	int bufferSize_8;
 	int currentPos_8;
+	int returnPos_8;
+	bool end_of_file;
 	char filepathChar[_MAX_PATH];
 	int32_t * memAddress;
 };
