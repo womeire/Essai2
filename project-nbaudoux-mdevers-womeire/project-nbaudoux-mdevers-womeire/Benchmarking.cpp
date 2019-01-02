@@ -9,6 +9,7 @@ Benchmarking::Benchmarking()
 	highest = 0;
 	total = 0;
 	lowest = 9999;
+	nbLowest = 0;
 	started = false;
 }
 
@@ -43,13 +44,21 @@ void Benchmarking::stopTest()
 }
 
 void Benchmarking::setLowest(double val) {
-	if (val < lowest)
+	if (val == lowest) {
+		nbLowest++;
+	}else if (val < lowest) {
 		lowest = val;
+		nbLowest = 0;
+	}
 }
 
 void Benchmarking::setHighest(double val) {
 	if (val > highest)
 		highest = val;
+}
+
+std::size_t Benchmarking::getNbLowest() {
+	return nbLowest;
 }
 
 double Benchmarking::getLowest() {
