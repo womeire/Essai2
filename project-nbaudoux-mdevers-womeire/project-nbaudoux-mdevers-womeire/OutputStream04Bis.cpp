@@ -11,28 +11,31 @@ OutputStream04Bis::~OutputStream04Bis()
 	close();
 }
 
-void OutputStream04Bis::create(string filepath, int bufSize, int fS_32)
+void OutputStream04Bis::create(string filepathOut, string filepathIn, int bufSize)
 {
-	bufferSize = bufSize;
+	bufferSize_8 = bufSize * sizeof(int32_t); //bfSize is the size of the buffer in size int32_t, it's translated here to size 8b for easier use later (functions take 8b values)
 
-	strcpy_s(filepathChar, filepath.c_str());
+	strcpy_s(filepathInChar, filepathIn.c_str());
+	strcpy_s(filepathOutChar, filepathOut.c_str());
 
-	currentPos = 0;
+	struct stat buf;
+	stat(filepathInChar, &buf);
+	fileSize_8 = buf.st_size;
 
 	try
 	{
 		//Create a file
-		bi::file_mapping::remove(filepathChar);
-		fileSize_32 = fS_32;
+		bi::file_mapping::remove(filepathOutChar);
 
 		std::filebuf fbuf;
-		fbuf.open(filepathChar, std::ios_base::in | std::ios_base::out
+		fbuf.open(filepathOutChar, std::ios_base::in | std::ios_base::out
 			| std::ios_base::trunc | std::ios_base::binary);
 		//Set the size
-		fbuf.pubseekoff((fileSize_32 * 4) - 1, std::ios_base::beg);
+		fbuf.pubseekoff(fileSize_8 - 1, std::ios_base::beg);
 		fbuf.sputc(0);
 
-		bi::file_mapping m_file(filepathChar, bi::read_write);
+		bi::file_mapping m_fileIn(filepathInChar, bi::read_only);
+		bi::file_mapping m_fileOut(filepathOutChar, bi::read_write);
 	}
 	catch (const bi::interprocess_exception e)
 	{
@@ -40,19 +43,21 @@ void OutputStream04Bis::create(string filepath, int bufSize, int fS_32)
 	}
 }
 
-void OutputStream04Bis::write(int32_t * elements)
+void OutputStream04Bis::write(int startingPoint)
 {
-	//Create a file mapping;
-	bi::file_mapping m_file(filepathChar, bi::read_write);
+	//todo maybe check if (startingPoint > filesize)
+
+	//Create a file mappings
+	bi::file_mapping m_fileIn(filepathInChar, bi::read_only);
+	bi::file_mapping m_fileOut(filepathOutChar, bi::read_write);
 
 	//Map the whole file with read-only permissions in this process
-	bi::mapped_region region(m_file, bi::read_write, currentPos * sizeof(int32_t), bufferSize * sizeof(int32_t));
+	bi::mapped_region regionIn(m_fileIn, bi::read_only, startingPoint, bufferSize_8);
+	bi::mapped_region regionOut(m_fileOut, bi::read_write, startingPoint, bufferSize_8);
 
-	currentPos += bufferSize; //increment size
-
-	int32_t* memAddressOut = (int32_t*)region.get_address();
-
-	memcpy(memAddressOut, elements, sizeof(int32_t)*bufferSize);
+	int8_t* memAddressIn = (int8_t*)regionIn.get_address();
+	int8_t* memAddressOut = (int8_t*)regionOut.get_address();
+	memcpy(memAddressOut, memAddressIn, bufferSize_8);
 }
 
 void OutputStream04Bis::close()
