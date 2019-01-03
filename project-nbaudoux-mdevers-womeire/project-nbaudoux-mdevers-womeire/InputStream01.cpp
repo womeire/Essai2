@@ -19,8 +19,13 @@ InputStream01::~InputStream01()
 /*Tries to open a file with the given filepath (read-only). Returns the filehandle as an int*/
 void InputStream01::open(string filepath)
 {
+	if (fileHandle != NULL && end_of_stream()) { // if a new file needs to be opened when a previous one has finished
+		_close(fileHandle);
+		fileHandle = NULL;
+	}
+
 	if (fileHandle != NULL) {
-		printf("This InputStream01 already opened a file");
+		printf("This InputStream01 already opened a file.\n");
 		return;
 	}
 
@@ -37,7 +42,7 @@ void InputStream01::open(string filepath)
 int32_t InputStream01::read_next()
 {
 	if (fileHandle < 0) {
-		printf("Invalid file handle value");
+		printf("Invalid file handle value.\n");
 		return NULL;
 	}
 
@@ -51,3 +56,11 @@ bool InputStream01::end_of_stream()
 {
 	return _eof(fileHandle);
 }
+
+void InputStream01::reset() {
+	if (fileHandle != NULL) {
+		_close(fileHandle);
+		fileHandle = NULL;
+	}
+}
+

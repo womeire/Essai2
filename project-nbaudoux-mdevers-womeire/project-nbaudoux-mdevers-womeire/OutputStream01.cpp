@@ -33,7 +33,7 @@ void OutputStream01::create(string filepath) // todo for the moment does overwri
 void OutputStream01::write(int32_t element)
 {
 	if (fileHandle < 0) {
-		printf("File not yet created. Call the create function first.");
+		printf("File not yet created. Call the create function first.\n");
 		return;
 	}
 

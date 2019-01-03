@@ -48,3 +48,7 @@ bool InputStream04::end_of_stream()
 {
 	return end_of_file;
 }
+
+void InputStream04::reset() {
+	currentPos_8 = 0;
+}

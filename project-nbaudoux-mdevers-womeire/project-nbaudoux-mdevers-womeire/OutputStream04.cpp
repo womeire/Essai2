@@ -63,5 +63,5 @@ void OutputStream04::write(int sizeToRead_8)
 
 void OutputStream04::close()
 {
-	// todo if anything needs to be done -> flush probably
+	currentPos_8 = 0;
 }

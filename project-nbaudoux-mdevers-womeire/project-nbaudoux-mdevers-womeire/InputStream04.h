@@ -12,6 +12,7 @@ public:
 	void open(string, int);
 	int read_next();
 	bool end_of_stream();
+	void reset();
 private:
 	int fileSize_8;
 	int bufferSize_8;

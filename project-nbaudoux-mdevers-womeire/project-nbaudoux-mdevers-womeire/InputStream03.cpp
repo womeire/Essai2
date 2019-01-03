@@ -8,7 +8,10 @@ InputStream03::InputStream03()
 
 InputStream03::~InputStream03()
 {
-	fclose(filePointer);
+	if (filePointer != NULL) {
+		fclose(filePointer);
+		filePointer = NULL;
+	}
 }
 
 /*Tries to open a file with the given filepath (read-only). Returns the filehandle as an int*/
@@ -58,4 +61,11 @@ int32_t* InputStream03::read_next()
 bool InputStream03::end_of_stream()
 {
 	return feof(filePointer);
+}
+
+void InputStream03::reset() {
+	if (filePointer != NULL) {
+		fclose(filePointer);
+		filePointer = NULL;
+	}
 }

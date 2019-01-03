@@ -10,6 +10,7 @@ public:
 	void open(string);
 	int32_t read_next();
 	bool end_of_stream();
+	void reset();
 private:
 	int fileHandle;
 };
