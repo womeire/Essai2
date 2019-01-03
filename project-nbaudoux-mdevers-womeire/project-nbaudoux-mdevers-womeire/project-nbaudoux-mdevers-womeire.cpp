@@ -10,19 +10,17 @@
 #include "InputStream03.h"
 #include "OutputStream03.h"
 #include "InputStream04.h"
-#include "InputStream04Bis.h"
 #include "OutputStream04.h"
-#include "OutputStream04Bis.h"
 #include "Benchmarking.h"
 #include "Multiway.h"
 
 /*const std::size_t NB_TESTS = 1000;
 const std::size_t NB_STREAMS = 30;
 const std::size_t NB_OF_ELEMENTS = 25600;*/
-const std::size_t NB_TESTS = 1;
+const std::size_t NB_TESTS = 2;
 const std::size_t NB_STREAMS = 2;
-const int BUFFER_SIZE = 2048;
-const std::size_t NB_ELEMENTS = 100 * BUFFER_SIZE;
+const int BUFFER_SIZE = 65536; //65536 = page_size of memory mapping
+const std::size_t NB_ELEMENTS = BUFFER_SIZE * 30000; // Should not exceed capacity of size_t (= 4294967295)!
 
 void testStream01(string filepathRead, string filepathWrite) {
 	InputStream01 inStream1;
@@ -70,16 +68,10 @@ void testStream03(string filepathRead, string filepathWrite) {
 }
 
 void testStream04Bis(string filepathRead, string filepathWrite) {
-	InputStream04Bis inStream4b;
+	InputStream04 inStream4b;
 	inStream4b.open(filepathRead, BUFFER_SIZE);
 
-	char filepathChar[_MAX_PATH];
-	strcpy_s(filepathChar, filepathRead.c_str());
-	struct stat buf;
-	stat(filepathChar, &buf);
-	int fileSize_32 = buf.st_size / sizeof(int32_t);
-
-	OutputStream04Bis outStream4b;
+	OutputStream04 outStream4b;
 	outStream4b.create(filepathWrite, filepathRead, BUFFER_SIZE);
 
 	for (int i = 0; !inStream4b.end_of_stream(); i++)
@@ -117,7 +109,7 @@ void DoIt(string filepathRead, string filepathWrite) {
 		//Map the whole file with read-only permissions in this process
 		bi::mapped_region regionOut(m_fileOut, bi::read_write, 0, buf.st_size);
 		bi::mapped_region regionIn(m_fileIn, bi::read_only, 0, buf.st_size);
-
+		auto test = regionIn.get_page_size();
 		int32_t * memAddressIn = (int32_t*)regionIn.get_address();
 		int32_t * memAddressOut = (int32_t*)regionOut.get_address();
 
@@ -135,6 +127,7 @@ void DoIt(string filepathRead, string filepathWrite) {
 
 int main()
 {
+
 #pragma region FileCreation
 	printf("Starting file creation.\n");
 
@@ -174,26 +167,6 @@ int main()
 
 #pragma endregion
 
-	//	Benchmarking chrono0, chrono1, chrono2, chrono3;
-	//
-	//	chrono0.startTest();
-	//	testStream02("C:\\project-tests\\exampleRead1.txt", "C:\\project-tests\\exampleWrite1.txt");
-	//	chrono0.stopTest();
-	//
-	//	chrono1.startTest();
-	//	testStream03("C:\\project-tests\\exampleRead1.txt", "C:\\project-tests\\exampleWrite1.txt");
-	//	chrono1.stopTest();
-	//
-	//	chrono2.startTest();
-	//	testStream04Bis("C:\\project-tests\\exampleRead1.txt", "C:\\project-tests\\exampleWrite1.txt");
-	//	chrono2.stopTest();
-	//
-	//	chrono3.startTest();
-	//	DoIt("C:\\project-tests\\exampleRead1.txt", "C:\\project-tests\\exampleWrite1.txt");
-	//	chrono3.stopTest();
-	//
-	//	std::cout << chrono0.getLastPerformance() << " " << chrono1.getLastPerformance() << " " << chrono2.getLastPerformance() << " " << chrono3.getLastPerformance() << std::endl;
-	//
 #pragma region Benchmarking - computing
 	printf("Starting the benchmarking.\n");
 
@@ -213,11 +186,11 @@ int main()
 	InputStream02 inStreams02[NB_STREAMS];
 	OutputStream02 outStreams02[NB_STREAMS];
 
-	InputStream02 inStreams03[NB_STREAMS];
-	OutputStream02 outStreams03[NB_STREAMS];
+	InputStream03 inStreams03[NB_STREAMS];
+	OutputStream03 outStreams03[NB_STREAMS];
 
-	InputStream02 inStreams04[NB_STREAMS];
-	OutputStream02 outStreams04[NB_STREAMS];
+	InputStream04 inStreams04[NB_STREAMS];
+	OutputStream04 outStreams04[NB_STREAMS];
 
 	//open and create all streams
 	for (size_t i = 0; i < NB_STREAMS; i++) {
@@ -227,15 +200,13 @@ int main()
 		inStreams02[i].open(filepathsRead[i]);
 		outStreams02[i].create(filepathsWrite[i * 4 + 1]);
 
-		inStreams03[i].open(filepathsRead[i]);
-		outStreams03[i].create(filepathsWrite[i * 4 + 2]);
+		inStreams03[i].open(filepathsRead[i], BUFFER_SIZE);
+		outStreams03[i].create(filepathsWrite[i * 4 + 2], BUFFER_SIZE);
 
-		inStreams04[i].open(filepathsRead[i]);
-		outStreams04[i].create(filepathsWrite[i * 4 + 3]);
+		inStreams04[i].open(filepathsRead[i], BUFFER_SIZE);
+		outStreams04[i].create(filepathsWrite[i * 4 + 3], filepathsRead[i], BUFFER_SIZE);
 	}
 
-	//Read all stream values one after the other todo does not take into account endoffile yet...
-	// todo separate chronos for read and write? I'd say no
 	for (std::size_t i = 0; i < NB_ELEMENTS; i++) {
 		for (size_t j = 0; j < NB_STREAMS; j++) {
 			if (!inStreams01[j].end_of_stream()) {
@@ -286,9 +257,9 @@ int main()
 	time(&current_time);
 	localtime_s(&time_info, &current_time);
 	stringstream benchInfo;
-	benchInfo << "N" << NB_TESTS << "_S" << NB_STREAMS << "_"
+	benchInfo << "N" << NB_TESTS << "_S" << NB_STREAMS << "_B" << BUFFER_SIZE << "_"
 		<< time_info.tm_hour << "h" << time_info.tm_min << "m" << time_info.tm_sec << "s_"
-		<< (time_info.tm_mon + 1) << "_" << (time_info.tm_year + 1900);
+		<< (time_info.tm_mday) << "_" << (time_info.tm_mon + 1);
 
 	string filename = "C:\\project-tests\\BenchResult_";
 	filename += benchInfo.str();

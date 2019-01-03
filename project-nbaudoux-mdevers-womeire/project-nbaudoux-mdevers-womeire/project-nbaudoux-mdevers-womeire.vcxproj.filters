@@ -42,22 +42,16 @@
     <ClInclude Include="Benchmarking.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="InputStream04.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Multiway.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="External.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="InputStream04Bis.h">
+    <ClInclude Include="InputStream04.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OutputStream04.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OutputStream04Bis.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -92,22 +86,16 @@
     <ClCompile Include="Benchmarking.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InputStream04.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Multiway.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="External.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InputStream04Bis.cpp">
+    <ClCompile Include="InputStream04.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OutputStream04.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OutputStream04Bis.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

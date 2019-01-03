@@ -23,7 +23,7 @@ void OutputStream01::create(string filepath) // todo for the moment does overwri
 	char fp[_MAX_PATH];
 	strcpy_s(fp, filepath.c_str());
 
-	errno_t error = _sopen_s(&fileHandle, fp, _O_CREAT | _O_WRONLY | _O_BINARY, _SH_DENYWR, _S_IWRITE);
+	errno_t error = _sopen_s(&fileHandle, fp, _O_CREAT | _O_WRONLY | _O_BINARY | _O_TRUNC, _SH_DENYWR, _S_IWRITE);
 	if (error != 0) {
 		printf("Error opening the stream: %d %d\n", error, fileHandle);
 		return;

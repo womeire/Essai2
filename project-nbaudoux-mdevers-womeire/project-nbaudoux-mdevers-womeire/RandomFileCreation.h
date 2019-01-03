@@ -5,7 +5,7 @@ using namespace std;
 class RandomFileCreation
 {
 public:
-	RandomFileCreation(string, int);
+	RandomFileCreation(string, size_t);
 	~RandomFileCreation();
 };
 
