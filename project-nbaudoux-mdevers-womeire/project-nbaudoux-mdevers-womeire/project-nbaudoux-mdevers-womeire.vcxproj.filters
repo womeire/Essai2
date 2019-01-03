@@ -48,6 +48,9 @@
     <ClInclude Include="Multiway.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="External.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="InputStream04Bis.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -93,6 +96,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Multiway.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="External.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InputStream04Bis.cpp">

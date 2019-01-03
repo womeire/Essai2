@@ -4,6 +4,7 @@
 
 Multiway::Multiway(std::vector<std::string> streams): _streams(streams)
 {
+	read();
 }
 
 void Multiway::read(std::size_t bfsize)
@@ -42,7 +43,7 @@ void Multiway::read(std::size_t bfsize)
 	std::cout << "Read done" << std::endl;
 }
 
-void Multiway::merge()
+std::vector<int> Multiway::merge()
 {
 	for (int i = 0; i < _content.size(); i++) {
 		std::vector<int> myvect = { _content.at(i).at(0), i };
@@ -61,6 +62,8 @@ void Multiway::merge()
 			_queue.push({ _content.at(min).at(0), min });
 		}
 	}
+
+	return _sorted;
 }
 
 void Multiway::showRes() {

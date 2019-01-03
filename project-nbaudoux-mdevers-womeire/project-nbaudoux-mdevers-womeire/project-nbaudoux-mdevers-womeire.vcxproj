@@ -158,6 +158,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Benchmarking.h" />
+    <ClInclude Include="External.h" />
     <ClInclude Include="InputStream01.h" />
     <ClInclude Include="InputStream02.h" />
     <ClInclude Include="InputStream03.h" />
@@ -174,6 +175,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Benchmarking.cpp" />
+    <ClCompile Include="External.cpp" />
     <ClCompile Include="InputStream01.cpp" />
     <ClCompile Include="InputStream02.cpp" />
     <ClCompile Include="InputStream03.cpp" />

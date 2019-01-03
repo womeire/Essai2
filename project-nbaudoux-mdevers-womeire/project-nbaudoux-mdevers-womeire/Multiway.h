@@ -11,8 +11,8 @@ class Multiway
 	std::vector<std::string> _streams;
 public:
 	Multiway(std::vector<std::string>);
+	std::vector<int> merge();
 	void read(std::size_t);
-	void merge();
 	void showRes();
 	~Multiway();
 };
