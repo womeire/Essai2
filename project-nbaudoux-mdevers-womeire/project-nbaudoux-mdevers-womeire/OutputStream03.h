@@ -8,10 +8,9 @@ public:
 	OutputStream03();
 	~OutputStream03();
 	void create(string, int);
-	void write(int32_t * buffer);
-	void write(int32_t * buffer, int buffSize);
+	void write(int32_t *);
 	void close();
 private:
-	FILE * filePointer;
 	int bufferSize;
+	FILE * filePointer;
 };

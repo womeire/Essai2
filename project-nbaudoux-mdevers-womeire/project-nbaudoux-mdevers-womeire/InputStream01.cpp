@@ -4,23 +4,23 @@
 
 InputStream01::InputStream01()
 {
-	fileHandle = -1;
+	fileHandle = NULL;
 }
 
 
 InputStream01::~InputStream01()
 {
-	printf("File Handle %d closed.\n", fileHandle);
-	//Error here. It seems that parameter not valid
-	//int res = _close(fileHandle);
-	//std::cout << "Close return value : " << res << std::endl;
+	if (fileHandle != NULL) {
+		_close(fileHandle);
+		fileHandle = NULL;
+	}
 }
 
 /*Tries to open a file with the given filepath (read-only). Returns the filehandle as an int*/
 void InputStream01::open(string filepath)
 {
-	if (fileHandle != -1) {
-		printf("Stream already in use by file handle %d\n", fileHandle);
+	if (fileHandle != NULL) {
+		printf("This InputStream01 already opened a file");
 		return;
 	}
 
@@ -32,29 +32,22 @@ void InputStream01::open(string filepath)
 		printf("Error opening the stream: %d %d\n", error, fileHandle);
 		return;
 	}
-
-	printf("File \"%s\" opened successfully. It's handle is %d.\n", fp, fileHandle);
 }
 
 int32_t InputStream01::read_next()
 {
 	if (fileHandle < 0) {
 		printf("Invalid file handle value");
-		return -1; // Todo not good as -1 can be a correct value for this function
+		return NULL;
 	}
 
-	uint8_t buffer[sizeof(int32_t)];
+	uint8_t elements[sizeof(int32_t)];
+	_read(fileHandle, elements, sizeof(int32_t));
 
-	_read(fileHandle, buffer, sizeof(int32_t));
-	//std::cout << "Reading : " << buffer << std::endl;//Test
-
-	return buffer[3] << 24 | buffer[2] << 16 | buffer[1] << 8 | buffer[0];
+	return elements[3] << 24 | elements[2] << 16 | elements[1] << 8 | elements[0];
 }
 
 bool InputStream01::end_of_stream()
 {
-	bool eof = _eof(fileHandle);
-	if (eof)
-		_close(fileHandle);
-	return eof;
+	return _eof(fileHandle);
 }

@@ -7,7 +7,7 @@ Multiway::Multiway(std::vector<std::string> streams): _streams(streams)
 	read();
 }
 
-void Multiway::read()
+void Multiway::read(std::size_t bfsize)
 {
 	_content.reserve(65000);
 	for (std::size_t i = 0; i < _streams.size(); i++) {
@@ -16,7 +16,7 @@ void Multiway::read()
 		std::cout << _content.at(i).capacity() << std::endl;
 		_content.at(i).reserve(1000);
 		std::cout << _content.at(i).capacity() << std::endl;
-		int bufferSize = 18;
+		int bufferSize = bfsize;
 
 		InputStream03 inStream3;
 		inStream3.open(_streams.at(i), bufferSize);
@@ -32,7 +32,8 @@ void Multiway::read()
 					_content.at(i).push_back(buffer[k]);
 			}
 			
-			buffer[relativePosition] = inStream3.read_next();
+			int32_t* read = inStream3.read_next();
+			memcpy(&buffer[relativePosition], read, bufferSize);
 		}
 		if (relativePosition > 0) { // the end of file is not necessary reached on a multiple op bufferSize, thus a final write is necessary
 			for (std::size_t k = 0; k < relativePosition; k++)

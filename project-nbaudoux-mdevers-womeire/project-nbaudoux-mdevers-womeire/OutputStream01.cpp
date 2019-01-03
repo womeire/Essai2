@@ -4,17 +4,18 @@
 
 OutputStream01::OutputStream01()
 {
-	fileHandle = -1;
+	fileHandle = NULL;
 }
 
 
 OutputStream01::~OutputStream01()
 {
+	close();
 }
 
 void OutputStream01::create(string filepath) // todo for the moment does overwrite as far as it writes data -> previous files can still be visible -> erase file if already exists
 {
-	if (fileHandle != -1) {
+	if (fileHandle != NULL) {
 		printf("Stream already in use by file handle %d\n", fileHandle);
 		return;
 	}
@@ -27,15 +28,13 @@ void OutputStream01::create(string filepath) // todo for the moment does overwri
 		printf("Error opening the stream: %d %d\n", error, fileHandle);
 		return;
 	}
-
-	printf("File \"%s\" created successfully. It's handle is %d.\n", fp, fileHandle);
 }
 
 void OutputStream01::write(int32_t element)
 {
 	if (fileHandle < 0) {
 		printf("File not yet created. Call the create function first.");
-		return; // Todo real error?
+		return;
 	}
 
 	uint8_t input[sizeof(int32_t)];
@@ -43,11 +42,14 @@ void OutputStream01::write(int32_t element)
 	input[1] = element >> 8;
 	input[2] = element >> 16;
 	input[3] = element >> 24;
-	//std::cout << "Writing : " << input << std::endl; //Test
+
 	_write(fileHandle, input, sizeof(int32_t));
 }
 
 void OutputStream01::close()
 {
-	_close(fileHandle);
+	if (fileHandle != NULL) {
+		_close(fileHandle);
+		fileHandle = NULL;
+	}
 }

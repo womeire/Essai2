@@ -10,7 +10,7 @@ OutputStream02::OutputStream02()
 
 OutputStream02::~OutputStream02()
 {
-	fclose(filePointer);
+	close();
 }
 
 void OutputStream02::create(string filepath)
@@ -28,21 +28,22 @@ void OutputStream02::create(string filepath)
 		printf("Error opening the stream: %d \n \"%s\"\n", error, filepathChar);
 		return;
 	}
-
-	printf("File \"%s\" opened successfully.\n", filepathChar);
 }
 
-void OutputStream02::write(int32_t * elements, int size)
+void OutputStream02::write(int32_t element)
 {
 	if (filePointer == NULL) {
 		printf("File not yet created. Call the create function first.\n");
-		return; // Todo real error?
+		return;
 	}
 
-	fwrite(elements, sizeof(int32_t), size, filePointer);
+	fwrite(&element, sizeof(int32_t), 1, filePointer);
 }
 
 void OutputStream02::close()
 {
-	fclose(filePointer);
+	if (filePointer != NULL) {
+		fclose(filePointer);
+		filePointer = NULL;
+	}
 }

@@ -10,10 +10,8 @@ public:
 	void open(string);
 	int32_t read_next();
 	bool end_of_stream();
-	long fileSize_32;
 private:
 	FILE * filePointer;
-	int32_t * buffer;
-	int currentPos;
+	int32_t * elementP;
 };
 

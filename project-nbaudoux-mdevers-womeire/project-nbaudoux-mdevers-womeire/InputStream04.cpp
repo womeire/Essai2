@@ -10,52 +10,67 @@ InputStream04::InputStream04()
 
 InputStream04::~InputStream04()
 {
-	printf("File closed.\n");
-	//boost::interprocess::file_mapping::remove(filepath);
+	printf("File closed.\n"); // todo delete functions needed here?
 }
 
-void InputStream04::open(string filepath, int bufSize, int fSize) // have third argument for size?
+void InputStream04::open(string filepath, int bufSize) // have third argument for size?
 {
 	bufferSize = bufSize;
-	fileSize = fSize;
 
 	strcpy_s(filepathChar, filepath.c_str());
 	buffer.resize(bufferSize);
 
-	//boost::interprocess::file_mapping::remove(filepathChar); // check if it's done the way it should
+	struct stat buf;
+	stat(filepathChar, &buf);
+	fileSize_32 = buf.st_size / 4; // divided by 4 because ftell returns the number of 8 bit units
 
 	try
 	{
 		//Create a file mapping
-		boost::interprocess::file_mapping m_file(filepathChar, boost::interprocess::read_only);
-
-		//m_file2 = m_file;
-		auto test = m_file.get_mode();
+		bi::file_mapping m_file(filepathChar, bi::read_only);
+		//my_mapped_file = &m_file;
+		//auto test = my_mapped_file->get_mode();
 	}
-	catch (const boost::interprocess::interprocess_exception e)
+	catch (const bi::interprocess_exception e)
 	{
 		e;
 	}
-
 }
 
-int32_t InputStream04::read_next()
+int32_t * InputStream04::read_next() // Should be "readnextbuffer"
 {
-	currentPos++;
+	try
+	{
+		if (currentPos < 0)
+			currentPos = 0;
 
-	if (currentPosInBuffer % bufferSize == 0) {
-		if (end_of_stream())
-			return NULL; // Todo not good as -1 can be a correct value for this function... but everything from min to max is...
-		LoadNextBuffer();
-		currentPosInBuffer = 0;
+		//Create a file mapping
+		bi::file_mapping m_file(filepathChar, bi::read_only);
+
+		//Map the whole file with read-only permissions in this process
+		bi::mapped_region region(m_file, bi::read_only, currentPos * 4, bufferSize * 4);
+
+		int32_t* res = (int32_t*)region.get_address();
+
+		
+		currentPos += bufferSize;
+
+		int32_t test0 = *res;
+		int32_t test1 = *(res+1);
+		int32_t test2 = *(res+2);
+
+		return res; // Id say this is not safe...
 	}
-
-	return buffer[currentPosInBuffer++]; //equivalent to "int32_t val = buffer[currentPosInBuffer]; ++currentPosInBuffer;return val;"
+	catch (const bi::interprocess_exception e)
+	{
+		e;
+	}
 }
 
 bool InputStream04::end_of_stream()
 {
-	return currentPos >= fileSize;
+	//return (currentPos / 4) >= fileSize_32; // todo check if div by 4 is right
+	return currentPos >= fileSize_32;
 }
 
 void InputStream04::LoadNextBuffer()
@@ -64,20 +79,19 @@ void InputStream04::LoadNextBuffer()
 	try
 	{
 		//Create a file mapping
-		boost::interprocess::file_mapping m_file(filepathChar, boost::interprocess::read_only);
+		bi::file_mapping m_file(filepathChar, bi::read_only);
 
-		//Map the whole file with read-write permissions in this process
-		boost::interprocess::mapped_region region(m_file, boost::interprocess::read_only, currentPos*4, bufferSize*4); // bufferSize is converted to size_t which is 4 bytes
+		//Map the whole file with read-only permissions in this process
+		bi::mapped_region region(m_file, bi::read_only, currentPos*4, bufferSize*4);
+		
+		memAddress = (int32_t*) region.get_address();
 
-		//auto test = region.get_page_size(); // = 65536
-
-		memAddress = (int32_t*)region.get_address();
 		for (int32_t i = 0; i < bufferSize; i++)
 		{
 			buffer[i] = *(memAddress + i);
 		}
 	}
-	catch (const boost::interprocess::interprocess_exception e)
+	catch (const bi::interprocess_exception e)
 	{
 		e;
 	}
