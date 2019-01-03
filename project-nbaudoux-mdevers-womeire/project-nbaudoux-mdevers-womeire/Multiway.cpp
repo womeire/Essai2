@@ -1,13 +1,15 @@
 #include "pch.h"
 #include "Multiway.h"
 
+const int BUFFER_SIZE = 256;
+
 
 Multiway::Multiway(std::vector<std::string> streams): _streams(streams)
 {
-	read();
+	read(BUFFER_SIZE);
 }
 
-void Multiway::read(std::size_t bfsize)
+void Multiway::read(int bfsize)
 {
 	_content.reserve(65000);
 	for (std::size_t i = 0; i < _streams.size(); i++) {
@@ -25,7 +27,6 @@ void Multiway::read(std::size_t bfsize)
 		int relativePosition = 0;
 
 		for (std::size_t j = 0; !inStream3.end_of_stream(); j++) {
-			std::cout << "Outer loop No" << i << " Inner loop No" << j << std::endl;
 			relativePosition = j % bufferSize;
 			if (j > 0 && relativePosition == 0) {
 				for (std::size_t k = 0; k < bufferSize; k++)

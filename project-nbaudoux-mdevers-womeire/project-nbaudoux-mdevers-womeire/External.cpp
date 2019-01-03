@@ -35,15 +35,20 @@ void External::getFileSize()
 void External::createStreams()
 {
 	InputStream03 stream;
-	stream.open(_stream, bufferSize);
+	stream.open(_stream, _M);
 	
+	//Not sure it's still work since modif in InputStream03... A bit lost here
 	for (std::size_t i = 0; i < _nbStreams; i++){
 		//Sorting via a priority queue
 		std::priority_queue<int, std::vector<int>, std::greater<int> > priority_queue;
 		std::size_t j = 0;
 
+		int32_t * buffer = (int32_t*)malloc(sizeof(int32_t) * bufferSize);
+		int32_t* read = stream.read_next();
+		memcpy(&buffer[_M], read, _M);
+
 		while (!stream.end_of_stream() and j < _M) {
-			priority_queue.push(stream.read_next());
+			priority_queue.push(buffer[j]);
 			j++;
 		}
 
