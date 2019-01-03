@@ -15,7 +15,7 @@
 #include "Multiway.h"
 
 
-const std::size_t NB_TESTS = 2;
+const std::size_t NB_TESTS = 50;
 const std::size_t NB_STREAMS = 3;
 const int BUFFER_SIZE = 65536; //65536 = page_size of memory mapping
 const std::size_t NB_ELEMENTS = BUFFER_SIZE * 10; // Should not exceed capacity of size_t (= 4294967295)!
@@ -55,6 +55,10 @@ void BenchmarkResultsToCSV();
 
 int main()
 {
+	size_t K_values[] = { 1, 2, 5, 10, 30 }; // Our test system can go up to 512 simultaneous streams (but asked to do max 30)
+	size_t N_values[] = { 1, 1024, 1024 * 1024, 1024 * 1024 * 1024, 1024 * 1024 * 1024 * 3 }; // Should not exceed capacity of size_t (= 4294967295)!
+	size_t B_values[] = {1, 1024, 65536, 1024 * 1024, 65536 * 1000}; // Multiples of 65536 are good for stream04 as it's the page_size
+
 	for (size_t i = 0; i < NB_TESTS; i++)
 	{
 		CreateFiles();
