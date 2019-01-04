@@ -13,6 +13,7 @@
 #include "OutputStream04.h"
 #include "Benchmarking.h"
 #include "Multiway.h"
+#include "External.h"
 
 
 const std::size_t NB_TESTS = 10;
@@ -48,6 +49,7 @@ void BenchmarkStream02(int);
 void BenchmarkStream03(int);
 void BenchmarkStream04(int);
 void BenchmarkResultsToCSV(Benchmarking*, int, int);
+void testExternal();
 
 int main()
 {
@@ -76,6 +78,7 @@ int main()
 		BenchmarkResultsToCSV(StreamChronos01, k, NB_ELEMENTS);
 	}
 #pragma endregion
+	testExternal();
 
 #pragma region Test_N
 
@@ -409,5 +412,19 @@ void testMemMapping(string filepathRead, string filepathWrite) {
 	catch (const bi::interprocess_exception e)
 	{
 		e;
+	}
+}
+
+void testExternal()
+{
+	std::size_t D_values[] = { 1, 32, 256, 1024 };
+	std::size_t M_values[] = { 1, 64, 1024, 2048 };
+	for (std::size_t m : M_values) {
+		for (std::size_t d : D_values) {
+			if (d < m) {
+				External external(filepathsRead[0], BUFFER_SIZE, 32);
+				external.showRes();
+			}
+		}
 	}
 }
