@@ -15,18 +15,14 @@
 #include "Multiway.h"
 
 
-const std::size_t NB_TESTS = 50;
-const std::size_t NB_STREAMS = 3;
+const std::size_t NB_TESTS = 10;
+const std::size_t NB_STREAMS = 30;
 const int BUFFER_SIZE = 65536; //65536 = page_size of memory mapping
 const std::size_t NB_ELEMENTS = BUFFER_SIZE * 10; // Should not exceed capacity of size_t (= 4294967295)!
 
 string filepathsRead[NB_STREAMS];
 string filepathsWrite[NB_STREAMS * 4];
 
-Benchmarking StreamChronos01[NB_STREAMS * NB_TESTS];
-Benchmarking StreamChronos02[NB_STREAMS * NB_TESTS];
-Benchmarking StreamChronos03[NB_STREAMS * NB_TESTS];
-Benchmarking StreamChronos04[NB_STREAMS * NB_TESTS];
 
 InputStream01 inStreams01[NB_STREAMS];
 OutputStream01 outStreams01[NB_STREAMS];
@@ -46,20 +42,52 @@ void testStream03(string filepathRead, string filepathWrite);
 void testStream04(string filepathRead, string filepathWrite);
 void testMemMapping(string filepathRead, string filepathWrite);
 
-void CreateFiles();
-void BenchmarkStream01(int);
+void CreateFiles(int);
+void BenchmarkStream01(Benchmarking*, int, int, int);
 void BenchmarkStream02(int);
 void BenchmarkStream03(int);
 void BenchmarkStream04(int);
-void BenchmarkResultsToCSV();
+void BenchmarkResultsToCSV(Benchmarking*, int, int);
 
 int main()
 {
-	size_t K_values[] = { 1, 2, 5, 10, 30 }; // Our test system can go up to 512 simultaneous streams (but asked to do max 30)
+	size_t K_values[] = { 1, 2, 5/*, 10, 30 */}; // Our test system can go up to 512 simultaneous streams (but asked to do max 30)
 	size_t N_values[] = { 1, 1024, 1024 * 1024, 1024 * 1024 * 1024, 1024 * 1024 * 1024 * 3 }; // Should not exceed capacity of size_t (= 4294967295)!
 	size_t B_values[] = {1, 1024, 65536, 1024 * 1024, 65536 * 1000}; // Multiples of 65536 are good for stream04 as it's the page_size
 
-	for (size_t i = 0; i < NB_TESTS; i++)
+#pragma region Test_k
+	
+	for(size_t k: K_values)
+	{
+		Benchmarking StreamChronos01[NB_STREAMS * NB_TESTS];
+		Benchmarking StreamChronos02[NB_STREAMS * NB_TESTS];
+		Benchmarking StreamChronos03[NB_STREAMS * NB_TESTS];
+		Benchmarking StreamChronos04[NB_STREAMS * NB_TESTS];
+
+		for (size_t i = 0; i < NB_TESTS; i++)
+		{
+			CreateFiles(k);
+			BenchmarkStream01(StreamChronos01, i, k, NB_ELEMENTS);
+			/*BenchmarkStream02(i);
+			BenchmarkStream03(i);
+			BenchmarkStream04(i);*/
+		}
+
+		BenchmarkResultsToCSV(StreamChronos01, k, NB_ELEMENTS);
+	}
+#pragma endregion
+
+#pragma region Test_N
+
+#pragma endregion
+
+#pragma region Test_B
+
+#pragma endregion
+
+
+
+	/*for (size_t i = 0; i < NB_TESTS; i++)
 	{
 		CreateFiles();
 		BenchmarkStream01(i);
@@ -68,7 +96,7 @@ int main()
 		BenchmarkStream04(i);
 	}
 
-	BenchmarkResultsToCSV();
+	BenchmarkResultsToCSV();*/
 
 	/*std::vector<std::string> streams = { filepathsRead[0] };
 	Multiway multiwayTest (streams);
@@ -77,17 +105,17 @@ int main()
 	multiwayTest.showRes();*/
 	//
 
-	system("pause");
+	std::system("pause");
 	return 0;
 }
 
-void CreateFiles() {
+void CreateFiles(int quantity = NB_STREAMS) {
 #pragma region FileCreation
 	printf("Starting file creation.\n");
 
 	////////////////////////	Create the filepaths	////////////////////////////////////
 	
-	for (size_t i = 0; i < NB_STREAMS; i++)
+	for (size_t i = 0; i < quantity; i++)
 	{
 		std::ostringstream stream;
 		//Defines different paths according the OS
@@ -112,7 +140,7 @@ void CreateFiles() {
 	}
 
 	////////////////////////	Generate the files	////////////////////////////////////
-	for (size_t i = 0; i < NB_STREAMS; i++)
+	for (size_t i = 0; i < quantity; i++)
 	{
 		new RandomFileCreation(filepathsRead[i], NB_ELEMENTS);
 	}
@@ -120,115 +148,115 @@ void CreateFiles() {
 #pragma endregion
 }
 
-void BenchmarkStream01(int iteration) {
-	printf("Starting iteration %d of stream01.\n", iteration);
+void BenchmarkStream01(Benchmarking* chrono , int iteration, int k = NB_STREAMS, int N = NB_ELEMENTS) {
+	printf("Starting iteration %d of stream01 [k=%d, N=%d].\n", iteration, k, N);
 
 	//open and create all streams
-	for (size_t i = 0; i < NB_STREAMS; i++) {
+	for (size_t i = 0; i < k; i++) {
 		inStreams01[i].open(filepathsRead[i]);
 		outStreams01[i].create(filepathsWrite[i * 4]);
 	}
 
 	//read and write for all streams
-	for (std::size_t i = 0; i < NB_ELEMENTS; i++) {
-		for (size_t j = 0; j < NB_STREAMS; j++) {
+	for (std::size_t i = 0; i < N; i++) {
+		for (size_t j = 0; j < k; j++) {
 			if (!inStreams01[j].end_of_stream()) {
-				StreamChronos01[j * iteration + j].startTest();
+				chrono[j * iteration + j].startTest();
 				outStreams01[j].write(inStreams01[j].read_next());
-				StreamChronos01[j * iteration + j].stopTest();
+				chrono[j * iteration + j].stopTest();
 			}
 		}
 	}
 
 	//close and reset all streams
-	for (size_t i = 0; i < NB_STREAMS; i++) {
+	for (size_t i = 0; i < k; i++) {
 		inStreams01[i].reset();
 		outStreams01[i].close();
 	}
 }
 
-void BenchmarkStream02(int iteration) {
-	printf("Starting iteration %d of stream02.\n", iteration);
+//void BenchmarkStream02(int iteration) {
+//	printf("Starting iteration %d of stream02.\n", iteration);
+//
+//	//open and create all streams
+//	for (size_t i = 0; i < NB_STREAMS; i++) {
+//		inStreams02[i].open(filepathsRead[i]);
+//		outStreams02[i].create(filepathsWrite[i * 4]);
+//	}
+//
+//	//read and write for all streams
+//	for (std::size_t i = 0; i < NB_ELEMENTS; i++) {
+//		for (size_t j = 0; j < NB_STREAMS; j++) {
+//			if (!inStreams02[j].end_of_stream()) {
+//				StreamChronos02[j * iteration + j].startTest();
+//				outStreams02[j].write(inStreams02[j].read_next());
+//				StreamChronos02[j * iteration + j].stopTest();
+//			}
+//		}
+//	}
+//
+//	//close and reset all streams
+//	for (size_t i = 0; i < NB_STREAMS; i++) {
+//		inStreams02[i].reset();
+//		outStreams02[i].close();
+//	}
+//}
+//
+//void BenchmarkStream03(int iteration) {
+//	printf("Starting iteration %d of stream03.\n", iteration);
+//
+//	//open and create all streams
+//	for (size_t i = 0; i < NB_STREAMS; i++) {
+//		inStreams03[i].open(filepathsRead[i], BUFFER_SIZE);
+//		outStreams03[i].create(filepathsWrite[i * 4], BUFFER_SIZE);
+//	}
+//
+//	//read and write for all streams
+//	for (std::size_t i = 0; i < NB_ELEMENTS; i++) {
+//		for (size_t j = 0; j < NB_STREAMS; j++) {
+//			if (!inStreams03[j].end_of_stream()) {
+//				StreamChronos03[j * iteration + j].startTest();
+//				outStreams03[j].write(inStreams03[j].read_next());
+//				StreamChronos03[j * iteration + j].stopTest();
+//			}
+//		}
+//	}
+//
+//	//close and reset all streams
+//	for (size_t i = 0; i < NB_STREAMS; i++) {
+//		inStreams03[i].reset();
+//		outStreams03[i].close();
+//	}
+//}
+//
+//void BenchmarkStream04(int iteration) {
+//	printf("Starting iteration %d of stream04.\n", iteration);
+//
+//	//open and create all streams
+//	for (size_t i = 0; i < NB_STREAMS; i++) {
+//		inStreams04[i].open(filepathsRead[i], BUFFER_SIZE);
+//		outStreams04[i].create(filepathsWrite[i * 4], filepathsRead[i], BUFFER_SIZE);
+//	}
+//
+//	//read and write for all streams
+//	for (std::size_t i = 0; i < NB_ELEMENTS; i++) {
+//		for (size_t j = 0; j < NB_STREAMS; j++) {
+//			if (!inStreams04[j].end_of_stream()) {
+//				StreamChronos04[j * iteration + j].startTest();
+//				outStreams04[j].write(inStreams04[j].read_next());
+//				StreamChronos04[j * iteration + j].stopTest();
+//			}
+//		}
+//	}
+//
+//	//close and reset all streams
+//	for (size_t i = 0; i < NB_STREAMS; i++) {
+//		inStreams04[i].reset();
+//		outStreams04[i].close();
+//	}
+//}
 
-	//open and create all streams
-	for (size_t i = 0; i < NB_STREAMS; i++) {
-		inStreams02[i].open(filepathsRead[i]);
-		outStreams02[i].create(filepathsWrite[i * 4]);
-	}
-
-	//read and write for all streams
-	for (std::size_t i = 0; i < NB_ELEMENTS; i++) {
-		for (size_t j = 0; j < NB_STREAMS; j++) {
-			if (!inStreams02[j].end_of_stream()) {
-				StreamChronos02[j * iteration + j].startTest();
-				outStreams02[j].write(inStreams02[j].read_next());
-				StreamChronos02[j * iteration + j].stopTest();
-			}
-		}
-	}
-
-	//close and reset all streams
-	for (size_t i = 0; i < NB_STREAMS; i++) {
-		inStreams02[i].reset();
-		outStreams02[i].close();
-	}
-}
-
-void BenchmarkStream03(int iteration) {
-	printf("Starting iteration %d of stream03.\n", iteration);
-
-	//open and create all streams
-	for (size_t i = 0; i < NB_STREAMS; i++) {
-		inStreams03[i].open(filepathsRead[i], BUFFER_SIZE);
-		outStreams03[i].create(filepathsWrite[i * 4], BUFFER_SIZE);
-	}
-
-	//read and write for all streams
-	for (std::size_t i = 0; i < NB_ELEMENTS; i++) {
-		for (size_t j = 0; j < NB_STREAMS; j++) {
-			if (!inStreams03[j].end_of_stream()) {
-				StreamChronos03[j * iteration + j].startTest();
-				outStreams03[j].write(inStreams03[j].read_next());
-				StreamChronos03[j * iteration + j].stopTest();
-			}
-		}
-	}
-
-	//close and reset all streams
-	for (size_t i = 0; i < NB_STREAMS; i++) {
-		inStreams03[i].reset();
-		outStreams03[i].close();
-	}
-}
-
-void BenchmarkStream04(int iteration) {
-	printf("Starting iteration %d of stream04.\n", iteration);
-
-	//open and create all streams
-	for (size_t i = 0; i < NB_STREAMS; i++) {
-		inStreams04[i].open(filepathsRead[i], BUFFER_SIZE);
-		outStreams04[i].create(filepathsWrite[i * 4], filepathsRead[i], BUFFER_SIZE);
-	}
-
-	//read and write for all streams
-	for (std::size_t i = 0; i < NB_ELEMENTS; i++) {
-		for (size_t j = 0; j < NB_STREAMS; j++) {
-			if (!inStreams04[j].end_of_stream()) {
-				StreamChronos04[j * iteration + j].startTest();
-				outStreams04[j].write(inStreams04[j].read_next());
-				StreamChronos04[j * iteration + j].stopTest();
-			}
-		}
-	}
-
-	//close and reset all streams
-	for (size_t i = 0; i < NB_STREAMS; i++) {
-		inStreams04[i].reset();
-		outStreams04[i].close();
-	}
-}
-
-void BenchmarkResultsToCSV(){
+void BenchmarkResultsToCSV(Benchmarking* chrono01, int k = NB_STREAMS, int N = NB_ELEMENTS){
 	#pragma region Benchmarking - results
 
 	printf("\"Printing\" the results.\n");
@@ -240,7 +268,7 @@ void BenchmarkResultsToCSV(){
 	time(&current_time);
 	localtime_s(&time_info, &current_time);
 	stringstream benchInfo;
-	benchInfo << "N" << NB_TESTS << "_S" << NB_STREAMS << "_B" << BUFFER_SIZE << "_"
+	benchInfo << "N" << N << "_S" << k << "_B" << BUFFER_SIZE << "_"
 		<< time_info.tm_hour << "h" << time_info.tm_min << "m" << time_info.tm_sec << "s_"
 		<< (time_info.tm_mday) << "_" << (time_info.tm_mon + 1);
 
@@ -255,13 +283,13 @@ void BenchmarkResultsToCSV(){
 		<< ";" << "TotalTime" << "\n";
 	for (size_t i = 0; i < NB_TESTS; i++)
 	{
-		for (size_t j = 0; j < NB_STREAMS; j++)
+		for (size_t j = 0; j < k; j++)
 		{
-			resultsFile << "1" << ";" << i << ";" << j << ";" << StreamChronos01[j + i * j].getHighest() << ";" << StreamChronos01[j + i * j].getLowest()
-				<< ";" << StreamChronos01[j + i * j].getLastPerformance() << ";" << StreamChronos01[j + i * j].getAvgPerformance()
-				<< ";" << StreamChronos01[j + i * j].getTotalTime() << "\n";
+			resultsFile << "1" << ";" << i << ";" << j << ";" << chrono01[j + i * j].getHighest() << ";" << chrono01[j + i * j].getLowest()
+				<< ";" << chrono01[j + i * j].getLastPerformance() << ";" << chrono01[j + i * j].getAvgPerformance()
+				<< ";" << chrono01[j + i * j].getTotalTime() << "\n";
 
-			resultsFile << "2" << ";" << i << ";" << j << ";" << StreamChronos02[j + i * j].getHighest() << ";" << StreamChronos02[j + i * j].getLowest()
+			/*resultsFile << "2" << ";" << i << ";" << j << ";" << StreamChronos02[j + i * j].getHighest() << ";" << StreamChronos02[j + i * j].getLowest()
 				<< ";" << StreamChronos02[j + i * j].getLastPerformance() << ";" << StreamChronos02[j + i * j].getAvgPerformance()
 				<< ";" << StreamChronos02[j + i * j].getTotalTime() << "\n";
 
@@ -271,7 +299,7 @@ void BenchmarkResultsToCSV(){
 
 			resultsFile << "4" << ";" << i << ";" << j << ";" << StreamChronos04[j + i * j].getHighest() << ";" << StreamChronos04[j + i * j].getLowest()
 				<< ";" << StreamChronos04[j + i * j].getLastPerformance() << ";" << StreamChronos04[j + i * j].getAvgPerformance()
-				<< ";" << StreamChronos04[j + i * j].getTotalTime() << "\n";
+				<< ";" << StreamChronos04[j + i * j].getTotalTime() << "\n";*/
 		}
 	}
 
