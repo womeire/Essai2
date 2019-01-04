@@ -161,11 +161,13 @@
   <ItemGroup>
     <ClInclude Include="Benchmarking.h" />
     <ClInclude Include="External.h" />
+    <ClInclude Include="InputStream.h" />
     <ClInclude Include="InputStream01.h" />
     <ClInclude Include="InputStream02.h" />
     <ClInclude Include="InputStream03.h" />
     <ClInclude Include="InputStream04.h" />
     <ClInclude Include="Multiway.h" />
+    <ClInclude Include="OutputStream.h" />
     <ClInclude Include="OutputStream01.h" />
     <ClInclude Include="OutputStream02.h" />
     <ClInclude Include="OutputStream03.h" />
@@ -176,11 +178,13 @@
   <ItemGroup>
     <ClCompile Include="Benchmarking.cpp" />
     <ClCompile Include="External.cpp" />
+    <ClCompile Include="InputStream.cpp" />
     <ClCompile Include="InputStream01.cpp" />
     <ClCompile Include="InputStream02.cpp" />
     <ClCompile Include="InputStream03.cpp" />
     <ClCompile Include="InputStream04.cpp" />
     <ClCompile Include="Multiway.cpp" />
+    <ClCompile Include="OutputStream.cpp" />
     <ClCompile Include="OutputStream01.cpp" />
     <ClCompile Include="OutputStream02.cpp" />
     <ClCompile Include="OutputStream03.cpp" />

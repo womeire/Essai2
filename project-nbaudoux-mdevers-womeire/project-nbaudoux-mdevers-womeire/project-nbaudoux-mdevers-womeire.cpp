@@ -14,27 +14,15 @@
 #include "Benchmarking.h"
 #include "Multiway.h"
 
-
+// Default values for the benchmarking parameters
 const std::size_t NB_TESTS = 10;
 const std::size_t NB_STREAMS = 30;
 const int BUFFER_SIZE = 65536; //65536 = page_size of memory mapping
-const std::size_t NB_ELEMENTS = BUFFER_SIZE * 10; // Should not exceed capacity of size_t (= 4294967295)!
+// NB_ELEMENTS should not exceed capacity of size_t (= 4294967295)!
+const std::size_t NB_ELEMENTS = BUFFER_SIZE * 10;
 
 string filepathsRead[NB_STREAMS];
 string filepathsWrite[NB_STREAMS * 4];
-
-
-InputStream01 inStreams01[NB_STREAMS];
-OutputStream01 outStreams01[NB_STREAMS];
-
-InputStream02 inStreams02[NB_STREAMS];
-OutputStream02 outStreams02[NB_STREAMS];
-
-InputStream03 inStreams03[NB_STREAMS];
-OutputStream03 outStreams03[NB_STREAMS];
-
-InputStream04 inStreams04[NB_STREAMS];
-OutputStream04 outStreams04[NB_STREAMS];
 
 void testStream01(string filepathRead, string filepathWrite);
 void testStream02(string filepathRead, string filepathWrite);
@@ -43,37 +31,68 @@ void testStream04(string filepathRead, string filepathWrite);
 void testMemMapping(string filepathRead, string filepathWrite);
 
 void CreateFiles(int);
-void BenchmarkStream01(Benchmarking*, int, int, int);
-void BenchmarkStream02(int);
-void BenchmarkStream03(int);
-void BenchmarkStream04(int);
+void BenchmarkStream(std::vector<InputStream*>, std::vector<OutputStream*>, Benchmarking*, int, int k, int);
+//void BenchmarkStream01(Benchmarking*, int, int, int);
+//void BenchmarkStream02(Benchmarking*, int, int, int);
+//void BenchmarkStream03(Benchmarking*, int, int, int, int);
+//void BenchmarkStream04(Benchmarking*, int, int, int, int);
 void BenchmarkResultsToCSV(Benchmarking*, int, int);
 
 int main()
 {
-	size_t K_values[] = { 1, 2, 5/*, 10, 30 */}; // Our test system can go up to 512 simultaneous streams (but asked to do max 30)
+	size_t K_values[] = { 1, 2/*, 5, 10, 30 */ }; // Our test system can go up to 512 simultaneous streams (but asked to do max 30)
 	size_t N_values[] = { 1, 1024, 1024 * 1024, 1024 * 1024 * 1024, 1024 * 1024 * 1024 * 3 }; // Should not exceed capacity of size_t (= 4294967295)!
-	size_t B_values[] = {1, 1024, 65536, 1024 * 1024, 65536 * 1000}; // Multiples of 65536 are good for stream04 as it's the page_size
+	size_t B_values[] = { 1, 1024, 65536, 1024 * 1024, 65536 * 1000 }; // Multiples of 65536 are good for stream04 as it's the page_size
+
+	//InputStream01 inStreams01[NB_STREAMS];
+	//OutputStream01 outStreams01[NB_STREAMS];
+
+	//InputStream02 inStreams02[NB_STREAMS];
+	//OutputStream02 outStreams02[NB_STREAMS];
+
+	//InputStream03 inStreams03[NB_STREAMS];
+	//OutputStream03 outStreams03[NB_STREAMS];
+
+	//InputStream04 inStreams04[NB_STREAMS];
+	//OutputStream04 outStreams04[NB_STREAMS];
 
 #pragma region Test_k
-	
-	for(size_t k: K_values)
-	{
-		Benchmarking StreamChronos01[NB_STREAMS * NB_TESTS];
-		Benchmarking StreamChronos02[NB_STREAMS * NB_TESTS];
-		Benchmarking StreamChronos03[NB_STREAMS * NB_TESTS];
-		Benchmarking StreamChronos04[NB_STREAMS * NB_TESTS];
 
+	for (size_t k : K_values)
+	{
+		Benchmarking* chronos01 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * k);
+		Benchmarking* chronos02 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * k);
+		Benchmarking* chronos03 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * k);
+		Benchmarking* chronos04 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * k);
+
+		for (size_t i = 0; i < NB_TESTS * k; i++)
+		{
+			chronos01[i] = Benchmarking();
+			chronos02[i] = Benchmarking();
+			chronos03[i] = Benchmarking();
+			chronos04[i] = Benchmarking();
+		}
+
+		std::vector<InputStream*> inStreams01(k);
+		std::vector<OutputStream*> outStreams01(k);
+
+		for (size_t i = 0; i < k; i++)
+		{
+			inStreams01[i] = new InputStream01();
+			outStreams01[i] = new OutputStream01();
+		}
+		string test = inStreams01[0]->getName();
 		for (size_t i = 0; i < NB_TESTS; i++)
 		{
 			CreateFiles(k);
-			BenchmarkStream01(StreamChronos01, i, k, NB_ELEMENTS);
-			/*BenchmarkStream02(i);
-			BenchmarkStream03(i);
-			BenchmarkStream04(i);*/
+
+			BenchmarkStream(inStreams01, outStreams01, chronos01, i, k, NB_ELEMENTS);
+			/*BenchmarkStream02(chronos01, i, k, NB_ELEMENTS);
+			BenchmarkStream03(chronos01, i, k, NB_ELEMENTS, BUFFER_SIZE);
+			BenchmarkStream04(chronos01, i, k, NB_ELEMENTS, BUFFER_SIZE);*/
 		}
 
-		BenchmarkResultsToCSV(StreamChronos01, k, NB_ELEMENTS);
+		BenchmarkResultsToCSV(chronos01, k, NB_ELEMENTS);
 	}
 #pragma endregion
 
@@ -114,7 +133,7 @@ void CreateFiles(int quantity = NB_STREAMS) {
 	printf("Starting file creation.\n");
 
 	////////////////////////	Create the filepaths	////////////////////////////////////
-	
+
 	for (size_t i = 0; i < quantity; i++)
 	{
 		std::ostringstream stream;
@@ -148,35 +167,63 @@ void CreateFiles(int quantity = NB_STREAMS) {
 #pragma endregion
 }
 
-void BenchmarkStream01(Benchmarking* chrono , int iteration, int k = NB_STREAMS, int N = NB_ELEMENTS) {
-	printf("Starting iteration %d of stream01 [k=%d, N=%d].\n", iteration, k, N);
-
+void BenchmarkStream(std::vector<InputStream*> inStream, std::vector<OutputStream*> outStream, Benchmarking* chrono, int iteration, int k = NB_STREAMS, int N = NB_ELEMENTS) {
+	printf("Starting iteration %d of %s [k=%d, N=%d].\n", iteration, "hahaha", k, N);
+	string test2 = inStream[0]->getName();
+	printf("%s", test2);
 	//open and create all streams
 	for (size_t i = 0; i < k; i++) {
-		inStreams01[i].open(filepathsRead[i]);
-		outStreams01[i].create(filepathsWrite[i * 4]);
+		inStream[i]->open(filepathsRead[i]);
+		outStream[i]->create(filepathsWrite[i * 4]);
 	}
 
 	//read and write for all streams
 	for (std::size_t i = 0; i < N; i++) {
 		for (size_t j = 0; j < k; j++) {
-			if (!inStreams01[j].end_of_stream()) {
-				chrono[j * iteration + j].startTest();
-				outStreams01[j].write(inStreams01[j].read_next());
-				chrono[j * iteration + j].stopTest();
+			if (!inStream[j]->end_of_stream()) {
+				chrono[iteration + iteration * j].startTest();
+				outStream[j]->write(inStream[j]->read_next());
+				chrono[iteration + iteration * j].stopTest();
 			}
 		}
 	}
 
 	//close and reset all streams
 	for (size_t i = 0; i < k; i++) {
-		inStreams01[i].reset();
-		outStreams01[i].close();
+		inStream[i]->reset();
+		outStream[i]->close();
 	}
 }
+//
+//void BenchmarkStream01(Benchmarking* chrono, int iteration, int k = NB_STREAMS, int N = NB_ELEMENTS) {
+//	printf("Starting iteration %d of stream01 [k=%d, N=%d].\n", iteration, k, N);
+//
+//	//open and create all streams
+//	for (size_t i = 0; i < k; i++) {
+//		inStreams01[i].open(filepathsRead[i]);
+//		outStreams01[i].create(filepathsWrite[i * 4]);
+//	}
+//
+//	//read and write for all streams
+//	for (std::size_t i = 0; i < N; i++) {
+//		for (size_t j = 0; j < k; j++) {
+//			if (!inStreams01[j].end_of_stream()) {
+//				chrono[iteration + iteration * j].startTest();
+//				outStreams01[j].write(inStreams01[j].read_next());
+//				chrono[iteration + iteration * j].stopTest();
+//			}
+//		}
+//	}
+//
+//	//close and reset all streams
+//	for (size_t i = 0; i < k; i++) {
+//		inStreams01[i].reset();
+//		outStreams01[i].close();
+//	}
+//}
 
-//void BenchmarkStream02(int iteration) {
-//	printf("Starting iteration %d of stream02.\n", iteration);
+//void BenchmarkStream02(Benchmarking* chrono, int iteration, int k = NB_STREAMS, int N = NB_ELEMENTS) {
+//	printf("Starting iteration %d of stream02 [k=%d, N=%d].\n", iteration, k, N);
 //
 //	//open and create all streams
 //	for (size_t i = 0; i < NB_STREAMS; i++) {
@@ -201,7 +248,7 @@ void BenchmarkStream01(Benchmarking* chrono , int iteration, int k = NB_STREAMS,
 //		outStreams02[i].close();
 //	}
 //}
-//
+
 //void BenchmarkStream03(int iteration) {
 //	printf("Starting iteration %d of stream03.\n", iteration);
 //
@@ -256,8 +303,8 @@ void BenchmarkStream01(Benchmarking* chrono , int iteration, int k = NB_STREAMS,
 //	}
 //}
 
-void BenchmarkResultsToCSV(Benchmarking* chrono01, int k = NB_STREAMS, int N = NB_ELEMENTS){
-	#pragma region Benchmarking - results
+void BenchmarkResultsToCSV(Benchmarking* chrono01, int k = NB_STREAMS, int N = NB_ELEMENTS) {
+#pragma region Benchmarking - results
 
 	printf("\"Printing\" the results.\n");
 
@@ -285,9 +332,9 @@ void BenchmarkResultsToCSV(Benchmarking* chrono01, int k = NB_STREAMS, int N = N
 	{
 		for (size_t j = 0; j < k; j++)
 		{
-			resultsFile << "1" << ";" << i << ";" << j << ";" << chrono01[j + i * j].getHighest() << ";" << chrono01[j + i * j].getLowest()
-				<< ";" << chrono01[j + i * j].getLastPerformance() << ";" << chrono01[j + i * j].getAvgPerformance()
-				<< ";" << chrono01[j + i * j].getTotalTime() << "\n";
+			resultsFile << "1" << ";" << i << ";" << j << ";" << chrono01[i + i * j].getHighest() << ";" << chrono01[i + i * j].getLowest()
+				<< ";" << chrono01[i + i * j].getLastPerformance() << ";" << chrono01[i + i * j].getAvgPerformance()
+				<< ";" << chrono01[i + i * j].getTotalTime() << "\n";
 
 			/*resultsFile << "2" << ";" << i << ";" << j << ";" << StreamChronos02[j + i * j].getHighest() << ";" << StreamChronos02[j + i * j].getLowest()
 				<< ";" << StreamChronos02[j + i * j].getLastPerformance() << ";" << StreamChronos02[j + i * j].getAvgPerformance()

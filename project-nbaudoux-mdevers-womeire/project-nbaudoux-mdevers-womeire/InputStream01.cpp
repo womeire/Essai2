@@ -39,7 +39,7 @@ void InputStream01::open(string filepath)
 	}
 }
 
-int32_t InputStream01::read_next()
+int32_t* InputStream01::read_next()
 {
 	if (fileHandle < 0) {
 		printf("Invalid file handle value.\n");
@@ -48,8 +48,8 @@ int32_t InputStream01::read_next()
 
 	uint8_t elements[sizeof(int32_t)];
 	_read(fileHandle, elements, sizeof(int32_t));
-
-	return elements[3] << 24 | elements[2] << 16 | elements[1] << 8 | elements[0];
+	int32_t res = elements[3] << 24 | elements[2] << 16 | elements[1] << 8 | elements[0];
+	return &res;
 }
 
 bool InputStream01::end_of_stream()
@@ -63,4 +63,9 @@ void InputStream01::reset() {
 		fileHandle = NULL;
 	}
 }
+
+string InputStream01::getName() {
+	return "Stream01";
+}
+
 

@@ -30,20 +30,14 @@ void OutputStream01::create(string filepath) // todo for the moment does overwri
 	}
 }
 
-void OutputStream01::write(int32_t element)
+void OutputStream01::write(int32_t* element)
 {
 	if (fileHandle < 0) {
 		printf("File not yet created. Call the create function first.\n");
 		return;
 	}
 
-	uint8_t input[sizeof(int32_t)];
-	input[0] = element;
-	input[1] = element >> 8;
-	input[2] = element >> 16;
-	input[3] = element >> 24;
-
-	_write(fileHandle, input, sizeof(int32_t));
+	_write(fileHandle, element, sizeof(int32_t));
 }
 
 void OutputStream01::close()
