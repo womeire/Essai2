@@ -13,5 +13,6 @@ public:
 	string getName();
 private:
 	int fileHandle;
+	int32_t element[1];
 };
 

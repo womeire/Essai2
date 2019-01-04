@@ -34,7 +34,7 @@ void InputStream02::open(string filepath)
 	}
 }
 
-int32_t InputStream02::read_next()
+int32_t* InputStream02::read_next()
 {
 	if (filePointer == NULL) {
 		printf("Invalid file or file not opened yet. \n");
@@ -43,7 +43,7 @@ int32_t InputStream02::read_next()
 
 	if (!end_of_stream()) {
 		fread(elementP, sizeof(int32_t), 1, filePointer);
-		return *elementP;
+		return elementP;
 	}
 	printf("Trying to read beyond end of file. \n");
 	return NULL;
@@ -59,4 +59,9 @@ void InputStream02::reset() {
 		fclose(filePointer);
 		filePointer = NULL;
 	}
+}
+
+string InputStream02::getName()
+{
+	return "Stream02";
 }

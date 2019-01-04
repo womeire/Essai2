@@ -1,14 +1,13 @@
-#include <string>
-using namespace std;
+#include "OutputStream.h"
 
 #pragma once
-class OutputStream02
+class OutputStream02 : public OutputStream
 {
 public:
 	OutputStream02();
 	~OutputStream02();
 	void create(string);
-	void write(int32_t);
+	void write(int32_t*);
 	void close();
 private:
 	FILE * filePointer;

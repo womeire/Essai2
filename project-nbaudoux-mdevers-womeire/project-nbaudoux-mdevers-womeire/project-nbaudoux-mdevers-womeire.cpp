@@ -16,7 +16,7 @@
 #include "External.h"
 
 // Default values for the benchmarking parameters
-const std::size_t NB_TESTS = 10;
+const std::size_t NB_TESTS = 5;
 const std::size_t NB_STREAMS = 30;
 const int BUFFER_SIZE = 65536; //65536 = page_size of memory mapping
 // NB_ELEMENTS should not exceed capacity of size_t (= 4294967295)!
@@ -42,7 +42,7 @@ void testExternal();
 
 int main()
 {
-	size_t K_values[] = { 1, 2/*, 5, 10, 30 */ }; // Our test system can go up to 512 simultaneous streams (but asked to do max 30)
+	size_t K_values[] = { 1 /*, 2, 5, 10, 30 */ }; // Our test system can go up to 512 simultaneous streams (but asked to do max 30)
 	size_t N_values[] = { 1, 1024, 1024 * 1024, 1024 * 1024 * 1024, 1024 * 1024 * 1024 * 3 }; // Should not exceed capacity of size_t (= 4294967295)!
 	size_t B_values[] = { 1, 1024, 65536, 1024 * 1024, 65536 * 1000 }; // Multiples of 65536 are good for stream04 as it's the page_size
 
@@ -78,17 +78,23 @@ int main()
 		std::vector<InputStream*> inStreams01(k);
 		std::vector<OutputStream*> outStreams01(k);
 
+		std::vector<InputStream*> inStreams02(k);
+		std::vector<OutputStream*> outStreams02(k);
+
 		for (size_t i = 0; i < k; i++)
 		{
 			inStreams01[i] = new InputStream01();
 			outStreams01[i] = new OutputStream01();
+			inStreams02[i] = new InputStream02();
+			outStreams02[i] = new OutputStream02();
 		}
-		string test = inStreams01[0]->getName();
+
 		for (size_t i = 0; i < NB_TESTS; i++)
 		{
 			CreateFiles(k);
 
 			BenchmarkStream(inStreams01, outStreams01, chronos01, i, k, NB_ELEMENTS);
+			BenchmarkStream(inStreams02, outStreams02, chronos02, i, k, NB_ELEMENTS);
 			/*BenchmarkStream02(chronos01, i, k, NB_ELEMENTS);
 			BenchmarkStream03(chronos01, i, k, NB_ELEMENTS, BUFFER_SIZE);
 			BenchmarkStream04(chronos01, i, k, NB_ELEMENTS, BUFFER_SIZE);*/
@@ -97,7 +103,6 @@ int main()
 		BenchmarkResultsToCSV(chronos01, k, NB_ELEMENTS);
 	}
 #pragma endregion
-	testExternal();
 
 #pragma region Test_N
 
@@ -107,7 +112,7 @@ int main()
 
 #pragma endregion
 
-
+	//testExternal();
 
 	/*for (size_t i = 0; i < NB_TESTS; i++)
 	{
@@ -171,9 +176,9 @@ void CreateFiles(int quantity = NB_STREAMS) {
 }
 
 void BenchmarkStream(std::vector<InputStream*> inStream, std::vector<OutputStream*> outStream, Benchmarking* chrono, int iteration, int k = NB_STREAMS, int N = NB_ELEMENTS) {
-	printf("Starting iteration %d of %s [k=%d, N=%d].\n", iteration, "hahaha", k, N);
-	string test2 = inStream[0]->getName();
-	printf("%s", test2);
+	printf("Starting iteration %d [k=%d, N=%d] with ", iteration, k, N);
+	cout << inStream[0]->getName() << ".\n"; // Funfact: printf makes it crash with getName() and s%
+
 	//open and create all streams
 	for (size_t i = 0; i < k; i++) {
 		inStream[i]->open(filepathsRead[i]);
@@ -185,7 +190,9 @@ void BenchmarkStream(std::vector<InputStream*> inStream, std::vector<OutputStrea
 		for (size_t j = 0; j < k; j++) {
 			if (!inStream[j]->end_of_stream()) {
 				chrono[iteration + iteration * j].startTest();
-				outStream[j]->write(inStream[j]->read_next());
+				int32_t* val = inStream[j]->read_next();
+
+				outStream[j]->write(val);
 				chrono[iteration + iteration * j].stopTest();
 			}
 		}

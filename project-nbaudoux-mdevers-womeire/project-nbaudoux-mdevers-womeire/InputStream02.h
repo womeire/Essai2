@@ -1,16 +1,16 @@
-#include <string>
-using namespace std;
+#include "InputStream.h"
 
 #pragma once
-class InputStream02
+class InputStream02 : public InputStream
 {
 public:
 	InputStream02();
 	~InputStream02();
 	void open(string);
-	int32_t read_next();
+	int32_t* read_next();
 	bool end_of_stream();
 	void reset();
+	string getName();
 private:
 	FILE * filePointer;
 	int32_t * elementP;

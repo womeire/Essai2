@@ -46,10 +46,9 @@ int32_t* InputStream01::read_next()
 		return NULL;
 	}
 
-	uint8_t elements[sizeof(int32_t)];
-	_read(fileHandle, elements, sizeof(int32_t));
-	int32_t res = elements[3] << 24 | elements[2] << 16 | elements[1] << 8 | elements[0];
-	return &res;
+	_read(fileHandle, element, sizeof(int32_t));
+
+	return element;
 }
 
 bool InputStream01::end_of_stream()
