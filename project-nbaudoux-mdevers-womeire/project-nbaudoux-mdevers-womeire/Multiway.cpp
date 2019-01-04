@@ -1,53 +1,38 @@
 #include "pch.h"
 #include "Multiway.h"
 
-const int BUFFER_SIZE = 256;
-
 
 Multiway::Multiway(std::vector<std::string> streams): _streams(streams)
 {
-	read(BUFFER_SIZE);
 }
 
 void Multiway::read(int bfsize)
 {
-	_content.reserve(65000);
+	_content.reserve(bfsize);
 	for (std::size_t i = 0; i < _streams.size(); i++) {
 		//Adding one vector per stream
 		_content.push_back({});
-		std::cout << _content.at(i).capacity() << std::endl;
-		_content.at(i).reserve(1000);
-		std::cout << _content.at(i).capacity() << std::endl;
+		_content.at(i).reserve(bfsize);
 		int bufferSize = bfsize;
 
 		InputStream03 inStream3;
 		inStream3.open(_streams.at(i), bufferSize);
 
 		int32_t * buffer = (int32_t*)malloc(sizeof(int32_t) * bufferSize);
-		int relativePosition = 0;
 
-		for (std::size_t j = 0; !inStream3.end_of_stream(); j++) {
-			relativePosition = j % bufferSize;
-			if (j > 0 && relativePosition == 0) {
-				for (std::size_t k = 0; k < bufferSize; k++)
-					_content.at(i).push_back(buffer[k]);
-			}
-			
-			int32_t* read = inStream3.read_next();
-			memcpy(&buffer[relativePosition], read, bufferSize);
-		}
-		if (relativePosition > 0) { // the end of file is not necessary reached on a multiple op bufferSize, thus a final write is necessary
-			for (std::size_t k = 0; k < relativePosition; k++)
+		while (!inStream3.end_of_stream()) {
+			buffer = inStream3.read_next();
+
+			for (std::size_t k = 0; k < bufferSize; k++)
 				_content.at(i).push_back(buffer[k]);
 		}
 	}
-	std::cout << "Read done" << std::endl;
 }
 
 std::vector<int> Multiway::merge()
 {
 	for (int i = 0; i < _content.size(); i++) {
-		std::vector<int> myvect = { _content.at(i).at(0), i };
+		std::vector<int32_t> myvect = { _content.at(i).at(0), i };
 		_queue.push(myvect);
 	}
 	

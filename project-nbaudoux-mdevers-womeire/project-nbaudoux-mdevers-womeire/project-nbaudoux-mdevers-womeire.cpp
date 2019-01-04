@@ -13,6 +13,7 @@
 #include "OutputStream04.h"
 #include "Benchmarking.h"
 #include "Multiway.h"
+#include "External.h"
 
 // Default values for the benchmarking parameters
 const std::size_t NB_TESTS = 10;
@@ -37,6 +38,7 @@ void BenchmarkStream(std::vector<InputStream*>, std::vector<OutputStream*>, Benc
 //void BenchmarkStream03(Benchmarking*, int, int, int, int);
 //void BenchmarkStream04(Benchmarking*, int, int, int, int);
 void BenchmarkResultsToCSV(Benchmarking*, int, int);
+void testExternal();
 
 int main()
 {
@@ -95,6 +97,7 @@ int main()
 		BenchmarkResultsToCSV(chronos01, k, NB_ELEMENTS);
 	}
 #pragma endregion
+	testExternal();
 
 #pragma region Test_N
 
@@ -457,4 +460,22 @@ void testMemMapping(string filepathRead, string filepathWrite) {
 	{
 		e;
 	}
+}
+
+void testExternal()
+{
+	Benchmarking chrono;
+	std::size_t D_values[] = { 1, 32, 256, 1024 };
+	std::size_t M_values[] = { 1, 64, 1024, 2048 };
+	for (std::size_t m : M_values) {
+		for (std::size_t d : D_values) {
+			if (d <= m) {
+				chrono.startTest();
+				External external(filepathsRead[0], BUFFER_SIZE, 32);
+				chrono.stopTest();
+				std::cout << "External Multiway mergesort done in " << chrono.getLastPerformance() << "ms with parameters M = " << m << ", d = " << d << std::endl;
+			}
+		}
+	}
+	std::cout << "Average performance " << chrono.getAvgPerformance() << std::endl;
 }

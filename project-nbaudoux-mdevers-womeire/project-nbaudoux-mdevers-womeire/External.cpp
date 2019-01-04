@@ -37,15 +37,13 @@ void External::createStreams()
 	InputStream03 stream;
 	stream.open(_stream, _M);
 	
-	//Not sure it's still work since modif in InputStream03... A bit lost here
 	for (std::size_t i = 0; i < _nbStreams; i++){
 		//Sorting via a priority queue
 		std::priority_queue<int, std::vector<int>, std::greater<int> > priority_queue;
 		std::size_t j = 0;
 
-		int32_t * buffer = (int32_t*)malloc(sizeof(int32_t) * bufferSize);
-		int32_t* read = stream.read_next();
-		memcpy(&buffer[_M], read, _M);
+		int32_t * buffer = (int32_t*)malloc(sizeof(int32_t) * _M);
+		buffer = stream.read_next();
 
 		while (!stream.end_of_stream() and j < _M) {
 			priority_queue.push(buffer[j]);
@@ -62,7 +60,6 @@ void External::createStreams()
 			res.push_back(priority_queue.top());
 			priority_queue.pop();
 		}
-
 		output.write(&res[0]);
 	}
 }
@@ -79,6 +76,7 @@ void External::merge()
 		}
 
 		Multiway multiway(streamsToOrder);
+		multiway.read(_M);
 		
 		std::string path = getAPath();
 
@@ -87,6 +85,24 @@ void External::merge()
 		std::vector<int> res = multiway.merge();
 		output.write(&res[0]);
 	}
+}
+
+void External::showRes()
+{
+	std::cout << "Showing result" << std::endl;
+	
+	std::string path = _queue_of_streams.front();
+	InputStream03 input; //Creating stream
+	input.open(path, bufferSize);
+	
+	int32_t * buffer = (int32_t*)malloc(sizeof(int32_t) * _M);
+
+	while (!input.end_of_stream()) {
+		buffer = input.read_next();
+		for (std::size_t i = 0; i < bufferSize; i++)
+			std::cout << buffer[i];
+	}
+	std::cout << std::endl;
 }
 
 External::~External()

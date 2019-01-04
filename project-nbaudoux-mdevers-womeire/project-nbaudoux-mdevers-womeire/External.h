@@ -14,6 +14,7 @@ public:
 	void getFileSize();
 	void createStreams();
 	void merge();
+	void showRes();
 	~External();
 };
 
