@@ -13,13 +13,13 @@ OutputStream03::~OutputStream03()
 	close();
 }
 
-void OutputStream03::create(string filepath, int bfSize)
+void OutputStream03::create(string filepath, size_t bufSize)
 {
 	if (filePointer != NULL) {
 		printf("Stream already in use.\n");
 		return;
 	}
-	bufferSize = bfSize;
+	bufferSize = bufSize;
 
 	char filepathChar[_MAX_PATH];
 	strcpy_s(filepathChar, filepath.c_str());

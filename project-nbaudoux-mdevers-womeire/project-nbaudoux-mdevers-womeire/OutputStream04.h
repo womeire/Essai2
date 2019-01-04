@@ -9,7 +9,7 @@ class OutputStream04 : public OutputStream
 public:
 	OutputStream04();
 	~OutputStream04();
-	void create(string, int);
+	void create(string, size_t);
 	void write(int32_t*);
 	void close();
 private:

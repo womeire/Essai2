@@ -10,7 +10,7 @@ class InputStream04 : public InputStream
 public:
 	InputStream04();
 	~InputStream04();
-	void open(string, int);
+	void open(string, size_t);
 	int32_t* read_next();
 	bool end_of_stream();
 	void reset();
@@ -23,5 +23,6 @@ private:
 	bool end_of_file;
 	char filepathChar[_MAX_PATH];
 	int32_t* memAddress;
+	//bi::file_mapping* & mFileAddr;
 };
 

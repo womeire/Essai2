@@ -12,10 +12,10 @@ OutputStream04::~OutputStream04()
 	close();
 }
 
-void OutputStream04::create(string filepathOut, int bufSize)
+void OutputStream04::create(string filepathOut, size_t bufSize)
 {
-	string filepathIn = "this is just temporary";
-	bufferSize_8 = bufSize * sizeof(int32_t); //bfSize is the size of the buffer in size int32_t, it's translated here to size 8b for easier use later (functions take 8b values)
+	string filepathIn = "this is just temporary"; //todo !!!
+	bufferSize_8 = bufSize * sizeof(int32_t); //bufSize is the size of the buffer in size int32_t, it's translated here to size 8b for easier use later (functions take 8b values)
 
 	strcpy_s(filepathInChar, filepathIn.c_str());
 	strcpy_s(filepathOutChar, filepathOut.c_str());
@@ -52,14 +52,14 @@ void OutputStream04::write(int32_t* sizeToRead)
 	bi::file_mapping m_fileOut(filepathOutChar, bi::read_write);
 
 	//Map the whole file with read-only permissions in this process
-	bi::mapped_region regionIn(m_fileIn, bi::read_only, currentPos_8, (int8_t)sizeToRead);
-	bi::mapped_region regionOut(m_fileOut, bi::read_write, currentPos_8, (int8_t)sizeToRead);
+	bi::mapped_region regionIn(m_fileIn, bi::read_only, currentPos_8, *sizeToRead);
+	bi::mapped_region regionOut(m_fileOut, bi::read_write, currentPos_8, *sizeToRead);
 
 	int8_t* memAddressIn = (int8_t*)regionIn.get_address();
 	int8_t* memAddressOut = (int8_t*)regionOut.get_address();
-	memcpy(memAddressOut, memAddressIn, (int8_t)sizeToRead);
+	memcpy(memAddressOut, memAddressIn, *sizeToRead);
 
-	currentPos_8 += (int8_t)sizeToRead;
+	currentPos_8 += *sizeToRead;
 }
 
 void OutputStream04::close()

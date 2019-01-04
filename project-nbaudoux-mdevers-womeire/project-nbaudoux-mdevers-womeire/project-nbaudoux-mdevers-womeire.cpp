@@ -16,11 +16,11 @@
 #include "External.h"
 
 // Default values for the benchmarking parameters
-const std::size_t NB_TESTS = 5;
-const std::size_t NB_STREAMS = 30;
-const int BUFFER_SIZE = 65536; //65536 = page_size of memory mapping
+const std::size_t NB_TESTS = 50;
+const std::size_t NB_STREAMS = 5;
+const int BUFFER_SIZE = 65536*10; //65536 = page_size of memory mapping
 // NB_ELEMENTS should not exceed capacity of size_t (= 4294967295)!
-const std::size_t NB_ELEMENTS = BUFFER_SIZE * 10;
+const std::size_t NB_ELEMENTS = BUFFER_SIZE * 1000;
 
 string filepathsRead[NB_STREAMS];
 string filepathsWrite[NB_STREAMS * 4];
@@ -34,9 +34,13 @@ void testExternal();
 
 int main()
 {
-	size_t K_values[] = { 1 /*, 2, 5, 10, 30 */ }; // Our test system can go up to 512 simultaneous streams (but asked to do max 30)
-	size_t N_values[] = { 1, 1024, 1024 * 1024, 1024 * 1024 * 1024, 1024 * 1024 * 1024 * 3 }; // Should not exceed capacity of size_t (= 4294967295)!
-	size_t B_values[] = { 1, 1024, 65536, 1024 * 1024, 65536 * 1000 }; // Multiples of 65536 are good for stream04 as it's the page_size
+	size_t K_values[] = { 1, 2, 5, 10, 30}; // Our test system can go up to 512 simultaneous streams (but asked to do max 30)
+	size_t N_values[] = { 1, 1024, 1024 * 1024, 1024 * 1024 * 1024, 1024 * 1024 * 1024 * 3}; // Should not exceed capacity of size_t (= 4294967295)!
+	size_t B_values[] = { 1 , 1024, 65536, 1024 * 1024, 65536 * 1000}; // Multiples of 65536 are good for stream04 as it's the page_size
+
+	/*InputStream04 testIn4();
+	OutputStream04 testOut4();
+	testIn4.create("C:\\project-tests\\exampleRead0.txt");*/
 
 #pragma region Test_k
 
@@ -89,23 +93,116 @@ int main()
 
 			BenchmarkStream(inStreams01, outStreams01, chronos01, i, k, BUFFER_SIZE, NB_ELEMENTS);
 			BenchmarkStream(inStreams02, outStreams02, chronos02, i, k, BUFFER_SIZE, NB_ELEMENTS);
-			BenchmarkStream(inStreams02, outStreams03, chronos03, i, k, BUFFER_SIZE, NB_ELEMENTS);
-			BenchmarkStream(inStreams02, outStreams04, chronos04, i, k, BUFFER_SIZE, NB_ELEMENTS);
+			BenchmarkStream(inStreams03, outStreams03, chronos03, i, k, BUFFER_SIZE, NB_ELEMENTS);
+			//BenchmarkStream(inStreams04, outStreams04, chronos04, i, k, BUFFER_SIZE, NB_ELEMENTS);
 		}
 
-		BenchmarkResultsToCSV(chronos01, chronos02, chronos03, chronos04, k, BUFFER_SIZE, NB_ELEMENTS, "TEST_K");
+		BenchmarkResultsToCSV(chronos01, chronos02, chronos03, NULL, k, BUFFER_SIZE, NB_ELEMENTS, "TEST_K");
 	}
 #pragma endregion
 
 #pragma region Test_N
+	for (size_t N : N_values)
+	{
+#pragma region Chrono initialisation
+		Benchmarking* chronos01 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
+		Benchmarking* chronos02 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
+		Benchmarking* chronos03 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
+		Benchmarking* chronos04 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
 
+		for (size_t i = 0; i < NB_TESTS * NB_STREAMS; i++)
+		{
+			chronos01[i] = Benchmarking();
+			chronos02[i] = Benchmarking();
+			chronos03[i] = Benchmarking();
+			chronos04[i] = Benchmarking();
+		}
+#pragma endregion
+
+#pragma region Stream initialisation
+		std::vector<InputStream*> inStreams01(NB_STREAMS);
+		std::vector<OutputStream*> outStreams01(NB_STREAMS);
+
+		std::vector<InputStream*> inStreams02(NB_STREAMS);
+		std::vector<OutputStream*> outStreams02(NB_STREAMS);
+
+		std::vector<InputStream*> inStreams03(NB_STREAMS);
+		std::vector<OutputStream*> outStreams03(NB_STREAMS);
+
+		std::vector<InputStream*> inStreams04(NB_STREAMS);
+		std::vector<OutputStream*> outStreams04(NB_STREAMS);
+
+		for (size_t i = 0; i < NB_STREAMS; i++)
+		{
+			inStreams01[i] = new InputStream01();
+			outStreams01[i] = new OutputStream01();
+			inStreams02[i] = new InputStream02();
+			outStreams02[i] = new OutputStream02();
+			inStreams03[i] = new InputStream03();
+			outStreams03[i] = new OutputStream03();
+			inStreams04[i] = new InputStream04();
+			outStreams04[i] = new OutputStream04();
+		}
+#pragma endregion
+
+		for (size_t i = 0; i < NB_TESTS; i++)
+		{
+			CreateFiles(NB_STREAMS);
+
+			BenchmarkStream(inStreams01, outStreams01, chronos01, i, NB_STREAMS, BUFFER_SIZE, N);
+			BenchmarkStream(inStreams02, outStreams02, chronos02, i, NB_STREAMS, BUFFER_SIZE, N);
+			BenchmarkStream(inStreams03, outStreams03, chronos03, i, NB_STREAMS, BUFFER_SIZE, N);
+			//BenchmarkStream(inStreams04, outStreams04, chronos04, i, k, BUFFER_SIZE, NB_ELEMENTS);
+		}
+
+		BenchmarkResultsToCSV(chronos01, chronos02, chronos03, NULL, NB_STREAMS, BUFFER_SIZE, N, "TEST_N");
+	}
 #pragma endregion
 
 #pragma region Test_B
+	for (size_t B : B_values)
+	{
+#pragma region Chrono initialisation
+		Benchmarking* chronos03 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
+		Benchmarking* chronos04 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
 
+		for (size_t i = 0; i < NB_TESTS * NB_STREAMS; i++)
+		{
+			chronos03[i] = Benchmarking();
+			chronos04[i] = Benchmarking();
+		}
 #pragma endregion
 
-	//testExternal();
+#pragma region Stream initialisation
+
+		std::vector<InputStream*> inStreams03(NB_STREAMS);
+		std::vector<OutputStream*> outStreams03(NB_STREAMS);
+
+		std::vector<InputStream*> inStreams04(NB_STREAMS);
+		std::vector<OutputStream*> outStreams04(NB_STREAMS);
+
+		for (size_t i = 0; i < NB_STREAMS; i++)
+		{
+			inStreams03[i] = new InputStream03();
+			outStreams03[i] = new OutputStream03();
+			inStreams04[i] = new InputStream04();
+			outStreams04[i] = new OutputStream04();
+		}
+#pragma endregion
+
+		for (size_t i = 0; i < NB_TESTS; i++)
+		{
+			CreateFiles(NB_STREAMS);
+
+			BenchmarkStream(inStreams03, outStreams03, chronos03, i, NB_STREAMS, B, NB_ELEMENTS);
+			//BenchmarkStream(inStreams04, outStreams04, chronos04, i, k, BUFFER_SIZE, NB_ELEMENTS);
+		}
+
+		BenchmarkResultsToCSV(NULL, NULL, chronos03, NULL, NB_STREAMS, B, NB_ELEMENTS, "TEST_B");
+	}
+#pragma endregion
+
+	testExternal();
 
 
 	/*std::vector<std::string> streams = { filepathsRead[0] };
@@ -214,21 +311,26 @@ void BenchmarkResultsToCSV(Benchmarking* chrono01, Benchmarking* chrono02, Bench
 	{
 		for (size_t j = 0; j < k; j++)
 		{
-			resultsFile << "1" << ";" << i << ";" << j << ";" << chrono01[i + i * j].getHighest() << ";" << chrono01[i + i * j].getLowest()
-				<< ";" << chrono01[i + i * j].getLastPerformance() << ";" << chrono01[i + i * j].getAvgPerformance()
-				<< ";" << chrono01[i + i * j].getTotalTime() << "\n";
-
-			resultsFile << "1" << ";" << i << ";" << j << ";" << chrono02[i + i * j].getHighest() << ";" << chrono02[i + i * j].getLowest()
-				<< ";" << chrono02[i + i * j].getLastPerformance() << ";" << chrono02[i + i * j].getAvgPerformance()
-				<< ";" << chrono02[i + i * j].getTotalTime() << "\n";
-
-			resultsFile << "1" << ";" << i << ";" << j << ";" << chrono03[i + i * j].getHighest() << ";" << chrono03[i + i * j].getLowest()
-				<< ";" << chrono03[i + i * j].getLastPerformance() << ";" << chrono03[i + i * j].getAvgPerformance()
-				<< ";" << chrono03[i + i * j].getTotalTime() << "\n";
-
-			resultsFile << "1" << ";" << i << ";" << j << ";" << chrono04[i + i * j].getHighest() << ";" << chrono04[i + i * j].getLowest()
-				<< ";" << chrono04[i + i * j].getLastPerformance() << ";" << chrono04[i + i * j].getAvgPerformance()
-				<< ";" << chrono04[i + i * j].getTotalTime() << "\n";
+			if (chrono01 != NULL) {
+				resultsFile << "1" << ";" << i << ";" << j << ";" << chrono01[i + i * j].getHighest() << ";" << chrono01[i + i * j].getLowest()
+					<< ";" << chrono01[i + i * j].getLastPerformance() << ";" << chrono01[i + i * j].getAvgPerformance()
+					<< ";" << chrono01[i + i * j].getTotalTime() << "\n";
+			}
+			if (chrono02 != NULL) {
+				resultsFile << "2" << ";" << i << ";" << j << ";" << chrono02[i + i * j].getHighest() << ";" << chrono02[i + i * j].getLowest()
+					<< ";" << chrono02[i + i * j].getLastPerformance() << ";" << chrono02[i + i * j].getAvgPerformance()
+					<< ";" << chrono02[i + i * j].getTotalTime() << "\n";
+			}
+			if (chrono03 != NULL) {
+				resultsFile << "3" << ";" << i << ";" << j << ";" << chrono03[i + i * j].getHighest() << ";" << chrono03[i + i * j].getLowest()
+					<< ";" << chrono03[i + i * j].getLastPerformance() << ";" << chrono03[i + i * j].getAvgPerformance()
+					<< ";" << chrono03[i + i * j].getTotalTime() << "\n";
+			}
+			if (chrono04 != NULL) {
+				resultsFile << "4" << ";" << i << ";" << j << ";" << chrono04[i + i * j].getHighest() << ";" << chrono04[i + i * j].getLowest()
+					<< ";" << chrono04[i + i * j].getLastPerformance() << ";" << chrono04[i + i * j].getAvgPerformance()
+					<< ";" << chrono04[i + i * j].getTotalTime() << "\n";
+			}
 		}
 	}
 
@@ -260,7 +362,6 @@ void testMemMapping(string filepathRead, string filepathWrite) {
 		//Create a file mapping
 		bi::file_mapping m_fileIn(filepathReadChar, bi::read_only);
 		bi::file_mapping m_fileOut(filepathWriteChar, bi::read_write);
-		//bi::managed_mapped_file m_fileOut(bi::create_only, filepathWriteChar, buf.st_size);
 
 		//Map the whole file with read-only permissions in this process
 		bi::mapped_region regionOut(m_fileOut, bi::read_write, 0, buf.st_size);

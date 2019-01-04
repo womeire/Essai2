@@ -4,6 +4,7 @@
 InputStream04::InputStream04()
 {
 	currentPos_8 = 0;
+	//mFileAddr = &(bi::file_mapping*)malloc(sizeof(bi::file_mapping));
 }
 
 
@@ -11,9 +12,9 @@ InputStream04::~InputStream04()
 {
 }
 
-void InputStream04::open(string filepath, int bufSize)
+void InputStream04::open(string filepath, size_t bufSize)
 {
-	bufferSize_8 = bufSize * sizeof(int32_t); //bfSize is the size of the buffer in size int32_t, it's translated here to size 8b for easier use later (functions take 8b values)
+	bufferSize_8 = bufSize * sizeof(int32_t); //bufSize is the size of the buffer in size int32_t, it's translated here to size 8b for easier use later (functions take 8b values)
 	end_of_file = false;
 	strcpy_s(filepathChar, filepath.c_str());
 
@@ -24,6 +25,7 @@ void InputStream04::open(string filepath, int bufSize)
 	try
 	{
 		bi::file_mapping m_file(filepathChar, bi::read_only);
+		//mFileAddr = &m_file;
 	}
 	catch (const bi::interprocess_exception e)
 	{
@@ -33,6 +35,15 @@ void InputStream04::open(string filepath, int bufSize)
 
 int32_t* InputStream04::read_next()
 {
+	try
+	{
+		//bi::mapped_region regionIn(*mFileAddr, bi::read_only, currentPos_8, bufferSize_8);
+
+	}
+	catch (const bi::interprocess_exception e)
+	{
+		e;
+	}
 	*returnPos = bufferSize_8;
 	
 	currentPos_8 += bufferSize_8;

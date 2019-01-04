@@ -6,14 +6,14 @@ Multiway::Multiway(std::vector<std::string> streams): _streams(streams)
 {
 }
 
-void Multiway::read(int bfsize)
+void Multiway::read(int bufSize)
 {
-	_content.reserve(bfsize);
+	_content.reserve(bufSize);
 	for (std::size_t i = 0; i < _streams.size(); i++) {
 		//Adding one vector per stream
 		_content.push_back({});
-		_content.at(i).reserve(bfsize);
-		int bufferSize = bfsize;
+		_content.at(i).reserve(bufSize);
+		int bufferSize = bufSize;
 
 		InputStream03 inStream3;
 		inStream3.open(_streams.at(i), bufferSize);

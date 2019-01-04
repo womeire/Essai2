@@ -15,13 +15,13 @@ InputStream03::~InputStream03()
 }
 
 /*Tries to open a file with the given filepath (read-only). Returns the filehandle as an int*/
-void InputStream03::open(string filepath, int bfSize)
+void InputStream03::open(string filepath, size_t bufSize)
 {
 	if (filePointer != NULL) {
 		printf("Stream already in use.\n");
 		return;
 	}
-	bufferSize = bfSize;
+	bufferSize = bufSize;
 
 	if (sizeof(int32_t)*bufferSize >= _HEAP_MAXREQ)
 		printf("Buffer size is too large for malloc"); // error will be catched later when initialising buffer
