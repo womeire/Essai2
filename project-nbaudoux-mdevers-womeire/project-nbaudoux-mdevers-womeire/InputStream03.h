@@ -1,8 +1,7 @@
-#include <string>
-using namespace std;
+#include "InputStream.h"
 
 #pragma once
-class InputStream03
+class InputStream03 : public InputStream
 {
 public:
 	InputStream03();
@@ -11,6 +10,7 @@ public:
 	int32_t* read_next();
 	bool end_of_stream();
 	void reset();
+	string getName();
 private:
 	int bufferSize;
 	FILE * filePointer;

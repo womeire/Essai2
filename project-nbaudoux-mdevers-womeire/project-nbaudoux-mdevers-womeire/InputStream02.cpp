@@ -15,7 +15,7 @@ InputStream02::~InputStream02()
 }
 
 /*Tries to open a file with the given filepath (read-only). Returns the filehandle as an int*/
-void InputStream02::open(string filepath)
+void InputStream02::open(string filepath, int bufSize)
 {
 	if (filePointer != NULL) {
 		printf("Stream already in use.\n");

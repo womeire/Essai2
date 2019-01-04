@@ -69,3 +69,8 @@ void InputStream03::reset() {
 		filePointer = NULL;
 	}
 }
+
+string InputStream03::getName()
+{
+	return "Stream03";
+}

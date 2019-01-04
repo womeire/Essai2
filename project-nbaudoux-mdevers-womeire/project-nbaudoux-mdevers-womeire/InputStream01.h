@@ -6,7 +6,7 @@ class InputStream01 : public InputStream
 public:
 	InputStream01();
 	~InputStream01();
-	void open(string);
+	void open(string, int);
 	int32_t* read_next();
 	bool end_of_stream();
 	void reset();

@@ -9,7 +9,6 @@ InputStream04::InputStream04()
 
 InputStream04::~InputStream04()
 {
-	// todo one flush or another needed here?
 }
 
 void InputStream04::open(string filepath, int bufSize)
@@ -32,16 +31,16 @@ void InputStream04::open(string filepath, int bufSize)
 	}
 }
 
-int InputStream04::read_next()
+int32_t* InputStream04::read_next()
 {
-	returnPos_8 = bufferSize_8;
+	*returnPos = bufferSize_8;
 	
 	currentPos_8 += bufferSize_8;
 	if (currentPos_8 >= fileSize_8) {
 		end_of_file = true;
-		returnPos_8 = fileSize_8 - currentPos_8 + bufferSize_8;
+		*returnPos = fileSize_8 - currentPos_8 + bufferSize_8;
 	}
-	return returnPos_8;
+	return returnPos;
 }
 
 bool InputStream04::end_of_stream()
@@ -51,4 +50,8 @@ bool InputStream04::end_of_stream()
 
 void InputStream04::reset() {
 	currentPos_8 = 0;
+}
+
+string InputStream04::getName() {
+	return "Stream04";
 }

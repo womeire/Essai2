@@ -1,8 +1,7 @@
-#include <string>
-using namespace std;
+#include "OutputStream.h"
 
 #pragma once
-class OutputStream03
+class OutputStream03 : public OutputStream
 {
 public:
 	OutputStream03();

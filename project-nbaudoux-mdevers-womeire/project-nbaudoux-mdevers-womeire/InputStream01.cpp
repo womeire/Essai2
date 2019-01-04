@@ -17,7 +17,7 @@ InputStream01::~InputStream01()
 }
 
 /*Tries to open a file with the given filepath (read-only). Returns the filehandle as an int*/
-void InputStream01::open(string filepath)
+void InputStream01::open(string filepath, int bufSize)
 {
 	if (fileHandle != NULL && end_of_stream()) { // if a new file needs to be opened when a previous one has finished
 		_close(fileHandle);

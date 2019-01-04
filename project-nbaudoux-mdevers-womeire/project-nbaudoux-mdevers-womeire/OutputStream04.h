@@ -1,15 +1,16 @@
 #include <string>
+#include "OutputStream.h"
 using namespace std;
 namespace bi = boost::interprocess;
 
 #pragma once
-class OutputStream04
+class OutputStream04 : public OutputStream
 {
 public:
 	OutputStream04();
 	~OutputStream04();
-	void create(string, string, int);
-	void write(int);
+	void create(string, int);
+	void write(int32_t*);
 	void close();
 private:
 	int fileSize_8;

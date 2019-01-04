@@ -6,7 +6,7 @@ class OutputStream02 : public OutputStream
 public:
 	OutputStream02();
 	~OutputStream02();
-	void create(string);
+	void create(string, int);
 	void write(int32_t*);
 	void close();
 private:

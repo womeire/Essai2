@@ -13,7 +13,7 @@ OutputStream01::~OutputStream01()
 	close();
 }
 
-void OutputStream01::create(string filepath) // todo for the moment does overwrite as far as it writes data -> previous files can still be visible -> erase file if already exists
+void OutputStream01::create(string filepath, int garbage = 0)
 {
 	if (fileHandle != NULL) {
 		printf("Stream already in use by file handle %d\n", fileHandle);
