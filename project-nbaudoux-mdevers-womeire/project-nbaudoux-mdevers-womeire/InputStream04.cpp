@@ -46,7 +46,7 @@ int32_t* InputStream04::read_next()
 	bi::file_mapping m_file(filepathChar, bi::read_only);
 	bi::mapped_region regionIn(m_file, bi::read_only, currentPos_8, range_8);
 
-	memcpy(elements, (int32_t*)regionIn.get_address(), range_8 / sizeof(int32_t)); 
+	memcpy(elements, (int32_t*)regionIn.get_address(), range_8); 
 
 	currentPos_8 += bufferSize_8;
 	return elements;

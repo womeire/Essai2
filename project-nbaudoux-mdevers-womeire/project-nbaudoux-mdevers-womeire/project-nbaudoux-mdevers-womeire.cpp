@@ -23,10 +23,10 @@ const std::size_t NB_STREAMS = 2;
 const int BUFFER_SIZE = 65536; //65536 = page_size of memory mapping
 // NB_ELEMENTS should not exceed capacity of size_t (= 4294967295)!
 const std::size_t NB_ELEMENTS = BUFFER_SIZE * 100;
-const bool isRelease = false; // changes the folder where the testing is done
+const bool isRelease = true; // changes the folder where the testing is done
 
-string filepathsRead[NB_STREAMS];
-string filepathsWrite[NB_STREAMS * 4];
+string filepathsRead[30]; // 30 is the max NB_STREAMS should take
+string filepathsWrite[30 * 4];
 
 void testMemMapping(string filepathRead, string filepathWrite);
 
@@ -46,19 +46,6 @@ int main()
 	size_t N_values[] = { 1, 1024, 1024 * 1024, 1024 * 1024 * 1024, 1024 * 1024 * 1024 * 3}; // Should not exceed capacity of size_t (= 4294967295)!
 	size_t B_values[] = { 1 , 1024, 65536, 1024 * 1024, 65536 * 100}; // Multiples of 65536 are good for stream04 as it's the page_size
 
-
-	InputStream04 testIn4 = InputStream04();
-	OutputStream04 testOut4 = OutputStream04();
-	testIn4.open("C:\\Users\\Wouter\\Desktop\\exampleRead0.txt", BUFFER_SIZE);
-	struct stat buf;
-	stat("C:\\Users\\Wouter\\Desktop\\exampleRead0.txt", &buf);
-	testOut4.create("C:\\Users\\Wouter\\Desktop\\exampleWrite0.txt", BUFFER_SIZE, buf.st_size);
-	while (!testIn4.end_of_stream())
-	{
-		testOut4.write_8(testIn4.read_next_8());
-	}
-	testOut4.close();
-	return 0; // todo erase to go further!!!
 #pragma region Test_k
 
 	for (size_t k : K_values)

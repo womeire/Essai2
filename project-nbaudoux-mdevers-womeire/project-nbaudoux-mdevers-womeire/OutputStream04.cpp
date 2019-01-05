@@ -52,7 +52,7 @@ void OutputStream04::write(int32_t* elements)
 	//Map the whole file with read-only permissions in this process
 	bi::mapped_region region(m_file, bi::read_write, currentPos_8, range_8);
 
-	memcpy((int32_t*)region.get_address(), elements, range_8 / sizeof(int32_t));
+	memcpy((int32_t*)region.get_address(), elements, range_8);
 
 	currentPos_8 += bufferSize_8;
 }
