@@ -15,7 +15,7 @@ public:
 private:
 	size_t fileSize_8;
 	size_t bufferSize_8;
-	size_t bufferSize_32;
+	size_t range_8;
 	size_t currentPos_8;
 	char filepathChar[_MAX_PATH];
 	int32_t * memAddress;

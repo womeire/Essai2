@@ -58,7 +58,7 @@ int main()
 		testOut4.write(testIn4.read_next());
 	}
 	testOut4.close();
-	return 0; // todo erase to go further!!!
+
 #pragma region Test_k
 
 	for (size_t k : K_values)

@@ -18,8 +18,8 @@ public:
 private:
 	size_t fileSize_8;
 	size_t bufferSize_8;
-	size_t bufferSize_32;
 	size_t currentPos_8;
+	size_t range_8;
 	bool end_of_file;
 	char filepathChar[_MAX_PATH];
 	int32_t* elements;
