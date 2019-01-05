@@ -4,7 +4,6 @@
 InputStream04::InputStream04()
 {
 	currentPos_8 = 0;
-	//mFileAddr = &(bi::file_mapping*)malloc(sizeof(bi::file_mapping));
 }
 
 
@@ -22,10 +21,12 @@ void InputStream04::open(string filepath, size_t bufSize)
 	stat(filepathChar, &buf);
 	fileSize_8 = buf.st_size;
 
+	elements = (int32_t*)malloc(bufferSize_8);
+	elements_s = (int8_t*)malloc(bufferSize_8);
+
 	try
 	{
 		bi::file_mapping m_file(filepathChar, bi::read_only);
-		//mFileAddr = &m_file;
 	}
 	catch (const bi::interprocess_exception e)
 	{
@@ -35,23 +36,32 @@ void InputStream04::open(string filepath, size_t bufSize)
 
 int32_t* InputStream04::read_next()
 {
-	try
-	{
-		//bi::mapped_region regionIn(*mFileAddr, bi::read_only, currentPos_8, bufferSize_8);
+	bi::file_mapping m_file(filepathChar, bi::read_only);
+	bi::mapped_region regionIn(m_file, bi::read_only, currentPos_8, bufferSize_8);
 
-	}
-	catch (const bi::interprocess_exception e)
-	{
-		e;
-	}
-	*returnPos = bufferSize_8;
-	
+	memcpy(elements, (int32_t*)regionIn.get_address(), bufferSize_8 / sizeof(int32_t)); // still have to code for when the buffer's not full - use the knowledge of bufsize & filesize
+
+
 	currentPos_8 += bufferSize_8;
 	if (currentPos_8 >= fileSize_8) {
 		end_of_file = true;
-		*returnPos = fileSize_8 - currentPos_8 + bufferSize_8;
 	}
-	return returnPos;
+	return elements;
+}
+
+int8_t* InputStream04::read_next_s()
+{
+	bi::file_mapping m_file(filepathChar, bi::read_only);
+	bi::mapped_region regionIn(m_file, bi::read_only, currentPos_8, bufferSize_8);
+
+	memcpy(elements_s, regionIn.get_address(), bufferSize_8); // still have to code for when the buffer's not full - use the knowledge of bufsize & filesize
+
+
+	currentPos_8 += bufferSize_8;
+	if (currentPos_8 >= fileSize_8) {
+		end_of_file = true;
+	}
+	return elements_s;
 }
 
 bool InputStream04::end_of_stream()

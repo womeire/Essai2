@@ -22,7 +22,7 @@ void OutputStream04::create(string filepathOut, size_t bufSize)
 
 	struct stat buf;
 	stat(filepathInChar, &buf);
-	fileSize_8 = buf.st_size;
+	fileSize_8 = bufferSize_8; // todo change back
 
 	try
 	{
@@ -47,19 +47,30 @@ void OutputStream04::create(string filepathOut, size_t bufSize)
 
 void OutputStream04::write(int32_t* sizeToRead)
 {
-	//Create a file mappings
-	bi::file_mapping m_fileIn(filepathInChar, bi::read_only);
+	//Create a file mapping
 	bi::file_mapping m_fileOut(filepathOutChar, bi::read_write);
 
 	//Map the whole file with read-only permissions in this process
-	bi::mapped_region regionIn(m_fileIn, bi::read_only, currentPos_8, *sizeToRead);
-	bi::mapped_region regionOut(m_fileOut, bi::read_write, currentPos_8, *sizeToRead);
+	bi::mapped_region regionOut(m_fileOut, bi::read_write, currentPos_8, bufferSize_8);
 
-	int8_t* memAddressIn = (int8_t*)regionIn.get_address();
+	int32_t* memAddressOut = (int32_t*)regionOut.get_address();
+	memcpy(memAddressOut, sizeToRead, bufferSize_8);
+
+	currentPos_8 += bufferSize_8;
+}
+
+void OutputStream04::write_s(int8_t* sizeToRead)
+{
+	//Create a file mapping
+	bi::file_mapping m_fileOut(filepathOutChar, bi::read_write);
+
+	//Map the whole file with read-only permissions in this process
+	bi::mapped_region regionOut(m_fileOut, bi::read_write, currentPos_8, bufferSize_8);
+
 	int8_t* memAddressOut = (int8_t*)regionOut.get_address();
-	memcpy(memAddressOut, memAddressIn, *sizeToRead);
+	memcpy(memAddressOut, sizeToRead, bufferSize_8);
 
-	currentPos_8 += *sizeToRead;
+	currentPos_8 += bufferSize_8;
 }
 
 void OutputStream04::close()

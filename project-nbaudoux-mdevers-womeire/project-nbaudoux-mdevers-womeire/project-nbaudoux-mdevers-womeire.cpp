@@ -23,6 +23,7 @@ const std::size_t NB_STREAMS = 2;
 const int BUFFER_SIZE = 65536; //65536 = page_size of memory mapping
 // NB_ELEMENTS should not exceed capacity of size_t (= 4294967295)!
 const std::size_t NB_ELEMENTS = BUFFER_SIZE * 100;
+const bool isRelease = false; // changes the folder where the testing is done
 
 string filepathsRead[NB_STREAMS];
 string filepathsWrite[NB_STREAMS * 4];
@@ -36,13 +37,21 @@ void testExternal();
 
 int main()
 {
+	//CreateFiles(1);
+	//testExternal();
+	//std::system("pause");
+	//return 0;
+
 	size_t K_values[] = { 1, 2, 5, 10, 30}; // Our test system can go up to 512 simultaneous streams (but asked to do max 30)
 	size_t N_values[] = { 1, 1024, 1024 * 1024, 1024 * 1024 * 1024, 1024 * 1024 * 1024 * 3}; // Should not exceed capacity of size_t (= 4294967295)!
 	size_t B_values[] = { 1 , 1024, 65536, 1024 * 1024, 65536 * 100}; // Multiples of 65536 are good for stream04 as it's the page_size
 
-	/*InputStream04 testIn4();
-	OutputStream04 testOut4();
-	testIn4.create("C:\\project-tests\\exampleRead0.txt");*/
+	InputStream04 testIn4 = InputStream04();
+	OutputStream04 testOut4 = OutputStream04();
+	testIn4.open("C:\\Users\\Wouter\\Desktop\\exampleRead0.txt", BUFFER_SIZE);
+	testOut4.create("C:\\Users\\Wouter\\Desktop\\exampleWrite0.txt", BUFFER_SIZE);
+	int8_t* test = testIn4.read_next_s();
+	testOut4.write_s(test);
 
 #pragma region Test_k
 
@@ -227,17 +236,23 @@ void CreateFiles(int quantity = NB_STREAMS) {
 	for (size_t i = 0; i < quantity; i++)
 	{
 		std::ostringstream stream;
+		string root;
+		if (isRelease)
+			root = "C:\\project-release\\";
+		else
+			root = "C:\\project-tests\\";
+
 		//Defines different paths according the OS
 		if (_WIN32) {
 			//_WIN32 works for both WIN32 and WIN64
 			//!WARNING! A folder with the name 'project-tests' has to be created on C: drive
 
 			stream.str("");
-			stream << "C:\\project-tests\\exampleRead" << i << ".txt"; // todo maybe not use text but some binary file extension
+			stream << root << "exampleRead" << i << ".txt"; // todo maybe not use text but some binary file extension
 			filepathsRead[i] = stream.str();
 			for (std::size_t j = 0; j < 4; j++) {
 				stream.str("");
-				stream << "C:\\project-tests\\exampleWrite" << i << "_" << j << ".txt";
+				stream << root << "exampleWrite" << i << "_" << j << ".txt";
 				filepathsWrite[i * 4 + j] = stream.str();
 			}
 		}

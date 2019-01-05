@@ -11,6 +11,7 @@ public:
 	~OutputStream04();
 	void create(string, size_t);
 	void write(int32_t*);
+	void write_s(int8_t*);
 	void close();
 private:
 	int fileSize_8;
