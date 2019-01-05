@@ -3,6 +3,8 @@
 
 #include "pch.h"
 #include "RandomFileCreation.h"
+#include "InputStream.h"
+#include "OutputStream.h"
 #include "InputStream01.h"
 #include "OutputStream01.h"
 #include "InputStream02.h"
@@ -16,11 +18,11 @@
 #include "External.h"
 
 // Default values for the benchmarking parameters
-const std::size_t NB_TESTS = 50;
-const std::size_t NB_STREAMS = 5;
-const int BUFFER_SIZE = 65536*10; //65536 = page_size of memory mapping
+const std::size_t NB_TESTS = 3;
+const std::size_t NB_STREAMS = 2;
+const int BUFFER_SIZE = 65536; //65536 = page_size of memory mapping
 // NB_ELEMENTS should not exceed capacity of size_t (= 4294967295)!
-const std::size_t NB_ELEMENTS = BUFFER_SIZE * 1000;
+const std::size_t NB_ELEMENTS = BUFFER_SIZE * 100;
 
 string filepathsRead[NB_STREAMS];
 string filepathsWrite[NB_STREAMS * 4];
@@ -36,7 +38,7 @@ int main()
 {
 	size_t K_values[] = { 1, 2, 5, 10, 30}; // Our test system can go up to 512 simultaneous streams (but asked to do max 30)
 	size_t N_values[] = { 1, 1024, 1024 * 1024, 1024 * 1024 * 1024, 1024 * 1024 * 1024 * 3}; // Should not exceed capacity of size_t (= 4294967295)!
-	size_t B_values[] = { 1 , 1024, 65536, 1024 * 1024, 65536 * 1000}; // Multiples of 65536 are good for stream04 as it's the page_size
+	size_t B_values[] = { 1 , 1024, 65536, 1024 * 1024, 65536 * 100}; // Multiples of 65536 are good for stream04 as it's the page_size
 
 	/*InputStream04 testIn4();
 	OutputStream04 testOut4();
