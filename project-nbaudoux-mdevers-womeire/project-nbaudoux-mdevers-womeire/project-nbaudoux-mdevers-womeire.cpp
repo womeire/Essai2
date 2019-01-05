@@ -20,10 +20,10 @@
 // Default values for the benchmarking parameters
 const std::size_t NB_TESTS = 3;
 const std::size_t NB_STREAMS = 2;
-const int BUFFER_SIZE = 65536; //65536 = page_size of memory mapping
+const std::size_t BUFFER_SIZE = 65536; //65536 = page_size of memory mapping
 // NB_ELEMENTS should not exceed capacity of size_t (= 4294967295)!
-const std::size_t NB_ELEMENTS = BUFFER_SIZE * 100;
-const bool isRelease = true; // changes the folder where the testing is done
+const std::size_t NB_ELEMENTS = BUFFER_SIZE * 2;
+const bool isRelease = false; // changes the folder where the testing is done
 
 string filepathsRead[30]; // 30 is the max NB_STREAMS should take
 string filepathsWrite[30 * 4];
@@ -37,11 +37,6 @@ void testExternal();
 
 int main()
 {
-	//CreateFiles(1);
-	//testExternal();
-	//std::system("pause");
-	//return 0;
-
 	size_t K_values[] = { 1, 2, 5, 10, 30}; // Our test system can go up to 512 simultaneous streams (but asked to do max 30)
 	size_t N_values[] = { 1, 1024, 1024 * 1024, 1024 * 1024 * 1024, 1024 * 1024 * 1024 * 3}; // Should not exceed capacity of size_t (= 4294967295)!
 	size_t B_values[] = { 1 , 1024, 65536, 1024 * 1024, 65536 * 100}; // Multiples of 65536 are good for stream04 as it's the page_size
@@ -272,7 +267,7 @@ void BenchmarkStream(std::vector<InputStream*> inStream, std::vector<OutputStrea
 	//open and create all streams
 	for (size_t i = 0; i < k; i++) {
 		inStream[i]->open(filepathsRead[i], B);
-		outStream[i]->create(filepathsWrite[i * 4], B, N);
+		outStream[i]->create(filepathsWrite[i * 4], B, N * sizeof(int32_t));
 	}
 
 	//read and write for all streams

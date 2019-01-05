@@ -12,11 +12,11 @@ OutputStream04::~OutputStream04()
 	close();
 }
 
-void OutputStream04::create(string filepath, size_t bufSize, size_t fileSize)
+void OutputStream04::create(string filepath, size_t bufSize_32, size_t fileSize_8)
 {
-	bufferSize_8 = bufSize * sizeof(int32_t); //bufSize is the size of the buffer in size int32_t, it's translated here to size 8b for easier use later (functions take 8b values)
+	bufferSize_8 = bufSize_32 * sizeof(int32_t); //bufSize is the size of the buffer in size int32_t, it's translated here to size 8b for easier use later (functions take 8b values)
 	strcpy_s(filepathChar, filepath.c_str());
-	fileSize_8 = fileSize;
+	fileSize_8 = fileSize_8;
 
 	try
 	{
@@ -42,6 +42,8 @@ void OutputStream04::write(int32_t* elements)
 {
 	if (currentPos_8 + bufferSize_8 >= fileSize_8) {
 		range_8 = fileSize_8 - currentPos_8;
+		if (range_8 <= 0)
+			return;
 	}
 	else
 		range_8 = bufferSize_8;
