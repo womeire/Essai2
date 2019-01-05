@@ -13,7 +13,7 @@ OutputStream01::~OutputStream01()
 	close();
 }
 
-void OutputStream01::create(string filepath, size_t bufSize)
+void OutputStream01::create(string filepath, size_t bufSize, size_t fileSize)
 {
 	if (fileHandle != NULL) {
 		printf("Stream already in use by file handle %d\n", fileHandle);

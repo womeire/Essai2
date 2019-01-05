@@ -9,17 +9,15 @@ class OutputStream04 : public OutputStream
 public:
 	OutputStream04();
 	~OutputStream04();
-	void create(string, size_t);
+	void create(string, size_t, size_t);
 	void write(int32_t*);
-	void write_s(int8_t*);
 	void close();
 private:
-	int fileSize_8;
-	int bufferSize_8;
-	int currentPos_8;
-	char filepathInChar[_MAX_PATH];
-	char filepathOutChar[_MAX_PATH];
-	int32_t * memAddressIn;
-	int32_t * memAddressOut;
+	size_t fileSize_8;
+	size_t bufferSize_8;
+	size_t bufferSize_32;
+	size_t currentPos_8;
+	char filepathChar[_MAX_PATH];
+	int32_t * memAddress;
 };
 

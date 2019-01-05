@@ -30,9 +30,9 @@ string filepathsWrite[NB_STREAMS * 4];
 
 void testMemMapping(string filepathRead, string filepathWrite);
 
-void CreateFiles(int);
-void BenchmarkStream(std::vector<InputStream*>, std::vector<OutputStream*>, Benchmarking*, int, int, int, int);
-void BenchmarkResultsToCSV(Benchmarking*, Benchmarking*, Benchmarking*, Benchmarking*, int, int, int, string);
+void CreateFiles(size_t);
+void BenchmarkStream(std::vector<InputStream*>, std::vector<OutputStream*>, Benchmarking*, size_t, size_t, size_t, size_t);
+void BenchmarkResultsToCSV(Benchmarking*, Benchmarking*, Benchmarking*, Benchmarking*, size_t, size_t, size_t, string);
 void testExternal();
 
 int main()
@@ -46,12 +46,18 @@ int main()
 	size_t N_values[] = { 1, 1024, 1024 * 1024, 1024 * 1024 * 1024, 1024 * 1024 * 1024 * 3}; // Should not exceed capacity of size_t (= 4294967295)!
 	size_t B_values[] = { 1 , 1024, 65536, 1024 * 1024, 65536 * 100}; // Multiples of 65536 are good for stream04 as it's the page_size
 
+	/*InputStream01 testIn1 = InputStream01();
+	testIn1.open("C:\\Users\\Wouter\\Desktop\\exampleRead0.txt");
+
+
 	InputStream04 testIn4 = InputStream04();
 	OutputStream04 testOut4 = OutputStream04();
 	testIn4.open("C:\\Users\\Wouter\\Desktop\\exampleRead0.txt", BUFFER_SIZE);
-	testOut4.create("C:\\Users\\Wouter\\Desktop\\exampleWrite0.txt", BUFFER_SIZE);
-	int8_t* test = testIn4.read_next_s();
-	testOut4.write_s(test);
+	struct stat buf;
+	stat("C:\\Users\\Wouter\\Desktop\\exampleRead0.txt", &buf);
+	testOut4.create("C:\\Users\\Wouter\\Desktop\\exampleWrite0.txt", BUFFER_SIZE, buf.st_size);
+	int32_t* test = testIn4.read_next();
+	testOut4.write(test);*/
 
 #pragma region Test_k
 
@@ -105,10 +111,10 @@ int main()
 			BenchmarkStream(inStreams01, outStreams01, chronos01, i, k, BUFFER_SIZE, NB_ELEMENTS);
 			BenchmarkStream(inStreams02, outStreams02, chronos02, i, k, BUFFER_SIZE, NB_ELEMENTS);
 			BenchmarkStream(inStreams03, outStreams03, chronos03, i, k, BUFFER_SIZE, NB_ELEMENTS);
-			//BenchmarkStream(inStreams04, outStreams04, chronos04, i, k, BUFFER_SIZE, NB_ELEMENTS);
+			BenchmarkStream(inStreams04, outStreams04, chronos04, i, k, BUFFER_SIZE, NB_ELEMENTS);
 		}
 
-		BenchmarkResultsToCSV(chronos01, chronos02, chronos03, NULL, k, BUFFER_SIZE, NB_ELEMENTS, "TEST_K");
+		BenchmarkResultsToCSV(chronos01, chronos02, chronos03, chronos04, k, BUFFER_SIZE, NB_ELEMENTS, "TEST_K");
 	}
 #pragma endregion
 
@@ -163,10 +169,10 @@ int main()
 			BenchmarkStream(inStreams01, outStreams01, chronos01, i, NB_STREAMS, BUFFER_SIZE, N);
 			BenchmarkStream(inStreams02, outStreams02, chronos02, i, NB_STREAMS, BUFFER_SIZE, N);
 			BenchmarkStream(inStreams03, outStreams03, chronos03, i, NB_STREAMS, BUFFER_SIZE, N);
-			//BenchmarkStream(inStreams04, outStreams04, chronos04, i, k, BUFFER_SIZE, NB_ELEMENTS);
+			BenchmarkStream(inStreams04, outStreams04, chronos04, i, NB_STREAMS, BUFFER_SIZE, N);
 		}
 
-		BenchmarkResultsToCSV(chronos01, chronos02, chronos03, NULL, NB_STREAMS, BUFFER_SIZE, N, "TEST_N");
+		BenchmarkResultsToCSV(chronos01, chronos02, chronos03, chronos04, NB_STREAMS, BUFFER_SIZE, N, "TEST_N");
 	}
 #pragma endregion
 
@@ -206,10 +212,10 @@ int main()
 			CreateFiles(NB_STREAMS);
 
 			BenchmarkStream(inStreams03, outStreams03, chronos03, i, NB_STREAMS, B, NB_ELEMENTS);
-			//BenchmarkStream(inStreams04, outStreams04, chronos04, i, k, BUFFER_SIZE, NB_ELEMENTS);
+			BenchmarkStream(inStreams04, outStreams04, chronos04, i, NB_STREAMS, B, NB_ELEMENTS);
 		}
 
-		BenchmarkResultsToCSV(NULL, NULL, chronos03, NULL, NB_STREAMS, B, NB_ELEMENTS, "TEST_B");
+		BenchmarkResultsToCSV(NULL, NULL, chronos03, chronos04, NB_STREAMS, B, NB_ELEMENTS, "TEST_B");
 	}
 #pragma endregion
 
@@ -227,7 +233,7 @@ int main()
 	return 0;
 }
 
-void CreateFiles(int quantity = NB_STREAMS) {
+void CreateFiles(size_t quantity = NB_STREAMS) {
 #pragma region FileCreation
 	printf("Starting file creation.\n");
 
@@ -272,14 +278,14 @@ void CreateFiles(int quantity = NB_STREAMS) {
 #pragma endregion
 }
 
-void BenchmarkStream(std::vector<InputStream*> inStream, std::vector<OutputStream*> outStream, Benchmarking* chrono, int iteration, int k = NB_STREAMS, int B = BUFFER_SIZE, int N = NB_ELEMENTS) {
+void BenchmarkStream(std::vector<InputStream*> inStream, std::vector<OutputStream*> outStream, Benchmarking* chrono, size_t iteration, size_t k = NB_STREAMS, size_t B = BUFFER_SIZE, size_t N = NB_ELEMENTS) {
 	printf("Starting iteration %d [k=%d, N=%d] with ", iteration, k, N);
 	cout << inStream[0]->getName() << ".\n"; // Funfact: printf makes it crash with getName() and s%
 
 	//open and create all streams
 	for (size_t i = 0; i < k; i++) {
 		inStream[i]->open(filepathsRead[i], B);
-		outStream[i]->create(filepathsWrite[i * 4], B);
+		outStream[i]->create(filepathsWrite[i * 4], B, N);
 	}
 
 	//read and write for all streams
@@ -300,7 +306,7 @@ void BenchmarkStream(std::vector<InputStream*> inStream, std::vector<OutputStrea
 	}
 }
 
-void BenchmarkResultsToCSV(Benchmarking* chrono01, Benchmarking* chrono02, Benchmarking* chrono03, Benchmarking* chrono04, int k = NB_STREAMS, int B = BUFFER_SIZE, int N = NB_ELEMENTS, string descriptionWord = "") {
+void BenchmarkResultsToCSV(Benchmarking* chrono01, Benchmarking* chrono02, Benchmarking* chrono03, Benchmarking* chrono04, size_t k = NB_STREAMS, size_t B = BUFFER_SIZE, size_t N = NB_ELEMENTS, string descriptionWord = "") {
 #pragma region Benchmarking - results
 
 	printf("\"Printing\" the results.\n");

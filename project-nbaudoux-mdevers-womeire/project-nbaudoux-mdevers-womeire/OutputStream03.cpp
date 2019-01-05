@@ -13,7 +13,7 @@ OutputStream03::~OutputStream03()
 	close();
 }
 
-void OutputStream03::create(string filepath, size_t bufSize)
+void OutputStream03::create(string filepath, size_t bufSize, size_t fileSize)
 {
 	if (filePointer != NULL) {
 		printf("Stream already in use.\n");

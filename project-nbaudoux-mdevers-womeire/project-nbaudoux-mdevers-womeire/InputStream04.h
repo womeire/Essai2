@@ -12,17 +12,16 @@ public:
 	~InputStream04();
 	void open(string, size_t);
 	int32_t* read_next();
-	int8_t* read_next_s();
 	bool end_of_stream();
 	void reset();
 	string getName();
 private:
-	int32_t fileSize_8;
-	int32_t bufferSize_8;
-	int32_t currentPos_8;
+	size_t fileSize_8;
+	size_t bufferSize_8;
+	size_t bufferSize_32;
+	size_t currentPos_8;
 	bool end_of_file;
 	char filepathChar[_MAX_PATH];
 	int32_t* elements;
-	int8_t* elements_s;
 };
 
