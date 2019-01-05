@@ -10,6 +10,8 @@ InputStream04::InputStream04()
 
 InputStream04::~InputStream04()
 {
+	free(elements);
+	free(elements_8);
 }
 
 void InputStream04::open(string filepath, size_t bufSize)

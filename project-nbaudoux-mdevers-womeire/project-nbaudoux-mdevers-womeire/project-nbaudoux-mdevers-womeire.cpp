@@ -22,7 +22,7 @@ const std::size_t NB_TESTS = 3;
 const std::size_t NB_STREAMS = 2;
 const std::size_t BUFFER_SIZE = 65536; //65536 = page_size of memory mapping
 // NB_ELEMENTS should not exceed capacity of size_t (= 4294967295)!
-const std::size_t NB_ELEMENTS = BUFFER_SIZE * 2;
+const std::size_t NB_ELEMENTS = BUFFER_SIZE * sizeof(int32_t) * 2;
 const bool isRelease = false; // changes the folder where the testing is done
 
 string filepathsRead[30]; // 30 is the max NB_STREAMS should take

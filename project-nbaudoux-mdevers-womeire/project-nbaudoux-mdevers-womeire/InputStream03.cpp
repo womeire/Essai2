@@ -12,6 +12,7 @@ InputStream03::~InputStream03()
 		fclose(filePointer);
 		filePointer = NULL;
 	}
+	free(buffer);
 }
 
 /*Tries to open a file with the given filepath (read-only). Returns the filehandle as an int*/

@@ -12,6 +12,7 @@ InputStream02::~InputStream02()
 		fclose(filePointer);
 		filePointer = NULL;
 	}
+	free(elementP);
 }
 
 /*Tries to open a file with the given filepath (read-only). Returns the filehandle as an int*/
