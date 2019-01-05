@@ -275,7 +275,8 @@ void BenchmarkStream(std::vector<InputStream*> inStream, std::vector<OutputStrea
 		for (size_t j = 0; j < k; j++) {
 			if (!inStream[j]->end_of_stream()) {
 				chrono[iteration + iteration * j].startTest();
-				outStream[j]->write(inStream[j]->read_next());
+				int32_t* test = inStream[j]->read_next();
+				outStream[j]->write(test);
 				chrono[iteration + iteration * j].stopTest();
 			}
 		}

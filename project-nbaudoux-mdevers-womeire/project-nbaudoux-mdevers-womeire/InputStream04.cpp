@@ -36,10 +36,8 @@ void InputStream04::open(string filepath, size_t bufSize)
 
 int32_t* InputStream04::read_next()
 {
-	if (currentPos_8 + bufferSize_8 >= fileSize_8) {
-		end_of_file = true;
+	if (currentPos_8 + bufferSize_8 > fileSize_8)
 		range_8 = fileSize_8 - currentPos_8;
-	}
 	else
 		range_8 = bufferSize_8;
 
@@ -49,12 +47,14 @@ int32_t* InputStream04::read_next()
 	memcpy(elements, (int32_t*)regionIn.get_address(), range_8); 
 
 	currentPos_8 += bufferSize_8;
+	if (currentPos_8 >= fileSize_8)
+		end_of_file = true;
 	return elements;
 }
 
 int8_t* InputStream04::read_next_8()
 {
-	if (currentPos_8 + bufferSize_8 >= fileSize_8) {
+	if (currentPos_8 + bufferSize_8 > fileSize_8) {
 		end_of_file = true;
 		range_8 = fileSize_8 - currentPos_8;
 	}
@@ -67,6 +67,8 @@ int8_t* InputStream04::read_next_8()
 	memcpy(elements_8, (int8_t*)regionIn.get_address(), range_8);
 
 	currentPos_8 += bufferSize_8;
+	if (currentPos_8 >= fileSize_8)
+		end_of_file = true;
 	return elements_8;
 }
 
