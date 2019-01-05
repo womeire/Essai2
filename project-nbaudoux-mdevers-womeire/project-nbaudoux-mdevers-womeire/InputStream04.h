@@ -12,6 +12,7 @@ public:
 	~InputStream04();
 	void open(string, size_t);
 	int32_t* read_next();
+	int8_t* read_next_8();
 	bool end_of_stream();
 	void reset();
 	string getName();
@@ -23,5 +24,6 @@ private:
 	bool end_of_file;
 	char filepathChar[_MAX_PATH];
 	int32_t* elements;
+	int8_t* elements_8;
 };
 

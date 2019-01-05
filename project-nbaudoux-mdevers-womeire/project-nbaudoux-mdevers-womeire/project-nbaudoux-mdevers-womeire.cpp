@@ -55,7 +55,7 @@ int main()
 	testOut4.create("C:\\Users\\Wouter\\Desktop\\exampleWrite0.txt", BUFFER_SIZE, buf.st_size);
 	while (!testIn4.end_of_stream())
 	{
-		testOut4.write(testIn4.read_next());
+		testOut4.write_8(testIn4.read_next_8());
 	}
 	testOut4.close();
 	return 0; // todo erase to go further!!!
