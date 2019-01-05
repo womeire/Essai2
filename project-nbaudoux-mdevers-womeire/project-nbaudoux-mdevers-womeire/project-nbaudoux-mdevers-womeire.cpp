@@ -93,7 +93,7 @@ int main()
 			BenchmarkStream(inStreams01, outStreams01, chronos01, i, k, BUFFER_SIZE, NB_ELEMENTS);
 			BenchmarkStream(inStreams02, outStreams02, chronos02, i, k, BUFFER_SIZE, NB_ELEMENTS);
 			BenchmarkStream(inStreams03, outStreams03, chronos03, i, k, BUFFER_SIZE, NB_ELEMENTS);
-			BenchmarkStream(inStreams04, outStreams04, chronos04, i, k, BUFFER_SIZE, NB_ELEMENTS);
+			//BenchmarkStream(inStreams04, outStreams04, chronos04, i, k, BUFFER_SIZE, NB_ELEMENTS);
 		}
 
 		BenchmarkResultsToCSV(chronos01, chronos02, chronos03, chronos04, k, BUFFER_SIZE, NB_ELEMENTS, "TEST_K");
@@ -275,8 +275,7 @@ void BenchmarkStream(std::vector<InputStream*> inStream, std::vector<OutputStrea
 		for (size_t j = 0; j < k; j++) {
 			if (!inStream[j]->end_of_stream()) {
 				chrono[iteration + iteration * j].startTest();
-				int32_t* test = inStream[j]->read_next();
-				outStream[j]->write(test);
+				outStream[j]->write(inStream[j]->read_next());
 				chrono[iteration + iteration * j].stopTest();
 			}
 		}
@@ -295,17 +294,21 @@ void BenchmarkResultsToCSV(Benchmarking* chrono01, Benchmarking* chrono02, Bench
 	printf("\"Printing\" the results.\n");
 
 	std::fstream resultsFile;
-
+	
 	std::time_t current_time;
 	struct tm time_info;
 	time(&current_time);
 	localtime_s(&time_info, &current_time);
 	stringstream benchInfo;
-	benchInfo << "N" << N << "_S" << k << "_B" << B << "_" << descriptionWord << "_"
+	benchInfo << "BenchResult_N" << N << "_S" << k << "_B" << B << "_" << descriptionWord << "_"
 		<< time_info.tm_hour << "h" << time_info.tm_min << "m" << time_info.tm_sec << "s_"
 		<< (time_info.tm_mday) << "_" << (time_info.tm_mon + 1);
 
-	string filename = "C:\\project-tests\\BenchResult_";
+	string filename;
+	if (isRelease)
+		filename = "C:\\project-release\\";
+	else
+		filename = "C:\\project-tests\\";
 	filename += benchInfo.str();
 	filename += ".csv";
 	resultsFile.open(filename, std::ios::out | std::ios::trunc);

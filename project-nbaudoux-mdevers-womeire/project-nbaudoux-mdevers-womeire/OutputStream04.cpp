@@ -47,16 +47,21 @@ void OutputStream04::write(int32_t* elements)
 	}
 	else
 		range_8 = bufferSize_8;
+	try {
+		//Create a file mapping
+		bi::file_mapping m_file(filepathChar, bi::read_write);
 
-	//Create a file mapping
-	bi::file_mapping m_file(filepathChar, bi::read_write);
+		//Map the whole file with read-only permissions in this process
+		bi::mapped_region region(m_file, bi::read_write, currentPos_8, range_8);
 
-	//Map the whole file with read-only permissions in this process
-	bi::mapped_region region(m_file, bi::read_write, currentPos_8, range_8);
+		memcpy((int32_t*)region.get_address(), elements, range_8);
 
-	memcpy((int32_t*)region.get_address(), elements, range_8);
-
-	currentPos_8 += bufferSize_8;
+		currentPos_8 += bufferSize_8;
+	}
+	catch (const bi::interprocess_exception e)
+	{
+		e;
+	}
 }
 
 void OutputStream04::write_8(int8_t* elements_8)

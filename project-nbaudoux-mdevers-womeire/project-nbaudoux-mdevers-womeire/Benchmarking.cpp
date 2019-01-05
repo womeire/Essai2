@@ -4,6 +4,16 @@
 
 Benchmarking::Benchmarking()
 {
+	reset();
+}
+
+
+Benchmarking::~Benchmarking()
+{
+}
+
+void Benchmarking::reset()
+{
 	average = 0;
 	nbObs = 0;
 	highest = 0;
@@ -11,11 +21,6 @@ Benchmarking::Benchmarking()
 	lowest = 9999;
 	nbLowest = 0;
 	started = false;
-}
-
-
-Benchmarking::~Benchmarking()
-{
 }
 
 void Benchmarking::startTest()

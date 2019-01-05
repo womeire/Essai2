@@ -10,6 +10,7 @@ class Benchmarking
 	bool started;
 public:
 	Benchmarking();
+	void reset();
 	void startTest();
 	void stopTest();
 	double getLowest();
