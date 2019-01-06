@@ -18,12 +18,12 @@
 #include "External.h"
 
 // Default values for the benchmarking parameters
-const std::size_t NB_TESTS = 3;
-const std::size_t NB_STREAMS = 2;
+const std::size_t NB_TESTS = 50;
+const std::size_t NB_STREAMS = 5;
 const std::size_t BUFFER_SIZE = 65536; //65536 = page_size of memory mapping
 // NB_ELEMENTS should not exceed capacity of size_t (= 4294967295)!
-const std::size_t NB_ELEMENTS = BUFFER_SIZE * sizeof(int32_t) * 10;
-const bool isRelease = false; // changes the folder where the testing is done
+const std::size_t NB_ELEMENTS = BUFFER_SIZE * sizeof(int32_t) * 1;
+const bool isRelease = true; // changes the folder where the testing is done
 
 string filepathsRead[30]; // 30 is the max NB_STREAMS should take
 string filepathsWrite[30 * 4];
@@ -37,179 +37,190 @@ void testExternal();
 
 int main()
 {
-	size_t K_values[] = { 1, 2, 5, 10/*, 30*/}; // Our test system can go up to 512 simultaneous streams (but asked to do max 30)
-	size_t N_values[] = {/* 1, 1024, 1024 * 1024, 1024 * 1024 * 1024,*/ 1024 * 1024 * 1024 * 3}; // Should not exceed capacity of size_t (= 4294967295)!
-	size_t B_values[] = { 1 , 1024, 65536, 1024 * 1024, 65536 * 100}; // Multiples of 65536 are good for stream04 as it's the page_size
+	size_t K_values[] = { 1, 2, 5, 10, 30 }; // Our test system can go up to 512 simultaneous streams (but asked to do max 30)
+	size_t N_values[] = { 1, 1024, 1024 * 1024, 1024 * 1024 * 1024, 1024 * 1024 * 1024 * 3 }; // Should not exceed capacity of size_t (= 4294967295)!
+	size_t B_values[] = { 1 , 1024, 65536, 1024 * 1024, 65536 * 100 }; // Multiples of 65536 are good for stream04 as it's the page_size
 
-#pragma region Test_k
+#pragma region Working Stream04
+	Benchmarking* chronos = new Benchmarking();
+	std::vector<InputStream*> inStreams04(1);
+	std::vector<OutputStream*> outStreams04(1);
+	inStreams04[0] = new InputStream04();
+	outStreams04[0] = new OutputStream04();
 
-	for (size_t k : K_values)
-	{
-#pragma region Chrono initialisation
-		Benchmarking* chronos01 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * k);
-		Benchmarking* chronos02 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * k);
-		Benchmarking* chronos03 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * k);
-		Benchmarking* chronos04 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * k);
-
-		for (size_t i = 0; i < NB_TESTS * k; i++)
-		{
-			chronos01[i] = Benchmarking();
-			chronos02[i] = Benchmarking();
-			chronos03[i] = Benchmarking();
-			chronos04[i] = Benchmarking();
-		}
+	CreateFiles(1);
+	BenchmarkStream(inStreams04, outStreams04, chronos, 0, 1, BUFFER_SIZE, NB_ELEMENTS);
+	printf ("Total time Stream04: %f.\n", chronos->getTotalTime());
 #pragma endregion
 
-#pragma region Stream initialisation
-		std::vector<InputStream*> inStreams01(k);
-		std::vector<OutputStream*> outStreams01(k);
-
-		std::vector<InputStream*> inStreams02(k);
-		std::vector<OutputStream*> outStreams02(k);
-
-		std::vector<InputStream*> inStreams03(k);
-		std::vector<OutputStream*> outStreams03(k);
-
-		std::vector<InputStream*> inStreams04(k);
-		std::vector<OutputStream*> outStreams04(k);
-
-		for (size_t i = 0; i < k; i++)
+	#pragma region Test_k
+	
+		for (size_t k : K_values)
 		{
-			inStreams01[i] = new InputStream01();
-			outStreams01[i] = new OutputStream01();
-			inStreams02[i] = new InputStream02();
-			outStreams02[i] = new OutputStream02();
-			inStreams03[i] = new InputStream03();
-			outStreams03[i] = new OutputStream03();
-			inStreams04[i] = new InputStream04();
-			outStreams04[i] = new OutputStream04();
+	#pragma region Chrono initialisation
+			Benchmarking* chronos01 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * k);
+			Benchmarking* chronos02 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * k);
+			Benchmarking* chronos03 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * k);
+			Benchmarking* chronos04 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * k);
+	
+			for (size_t i = 0; i < NB_TESTS * k; i++)
+			{
+				chronos01[i] = Benchmarking();
+				chronos02[i] = Benchmarking();
+				chronos03[i] = Benchmarking();
+				chronos04[i] = Benchmarking();
+			}
+	#pragma endregion
+	
+	#pragma region Stream initialisation
+			std::vector<InputStream*> inStreams01(k);
+			std::vector<OutputStream*> outStreams01(k);
+	
+			std::vector<InputStream*> inStreams02(k);
+			std::vector<OutputStream*> outStreams02(k);
+	
+			std::vector<InputStream*> inStreams03(k);
+			std::vector<OutputStream*> outStreams03(k);
+	
+			std::vector<InputStream*> inStreams04(k);
+			std::vector<OutputStream*> outStreams04(k);
+	
+			for (size_t i = 0; i < k; i++)
+			{
+				inStreams01[i] = new InputStream01();
+				outStreams01[i] = new OutputStream01();
+				inStreams02[i] = new InputStream02();
+				outStreams02[i] = new OutputStream02();
+				inStreams03[i] = new InputStream03();
+				outStreams03[i] = new OutputStream03();
+				inStreams04[i] = new InputStream04();
+				outStreams04[i] = new OutputStream04();
+			}
+	#pragma endregion
+			for (size_t i = 0; i < NB_TESTS; i++)
+			{
+				CreateFiles(k);
+	
+				BenchmarkStream(inStreams01, outStreams01, chronos01, i, k, BUFFER_SIZE, NB_ELEMENTS);
+				BenchmarkStream(inStreams02, outStreams02, chronos02, i, k, BUFFER_SIZE, NB_ELEMENTS);
+				BenchmarkStream(inStreams03, outStreams03, chronos03, i, k, BUFFER_SIZE, NB_ELEMENTS);
+				//BenchmarkStream(inStreams04, outStreams04, chronos04, i, k, BUFFER_SIZE, NB_ELEMENTS);
+			}
+	
+			BenchmarkResultsToCSV(chronos01, chronos02, chronos03, chronos04, k, BUFFER_SIZE, NB_ELEMENTS, "TEST_K");
 		}
-#pragma endregion
-
-		for (size_t i = 0; i < NB_TESTS; i++)
+	#pragma endregion
+	
+	#pragma region Test_N
+		for (size_t N : N_values)
 		{
-			CreateFiles(k);
-
-			//BenchmarkStream(inStreams01, outStreams01, chronos01, i, k, BUFFER_SIZE, NB_ELEMENTS);
-			//BenchmarkStream(inStreams02, outStreams02, chronos02, i, k, BUFFER_SIZE, NB_ELEMENTS);
-			//BenchmarkStream(inStreams03, outStreams03, chronos03, i, k, BUFFER_SIZE, NB_ELEMENTS);
-			BenchmarkStream(inStreams04, outStreams04, chronos04, i, k, BUFFER_SIZE, NB_ELEMENTS);
+	#pragma region Chrono initialisation
+			Benchmarking* chronos01 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
+			Benchmarking* chronos02 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
+			Benchmarking* chronos03 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
+			Benchmarking* chronos04 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
+	
+			for (size_t i = 0; i < NB_TESTS * NB_STREAMS; i++)
+			{
+				chronos01[i] = Benchmarking();
+				chronos02[i] = Benchmarking();
+				chronos03[i] = Benchmarking();
+				chronos04[i] = Benchmarking();
+			}
+	#pragma endregion
+	
+	#pragma region Stream initialisation
+			std::vector<InputStream*> inStreams01(NB_STREAMS);
+			std::vector<OutputStream*> outStreams01(NB_STREAMS);
+	
+			std::vector<InputStream*> inStreams02(NB_STREAMS);
+			std::vector<OutputStream*> outStreams02(NB_STREAMS);
+	
+			std::vector<InputStream*> inStreams03(NB_STREAMS);
+			std::vector<OutputStream*> outStreams03(NB_STREAMS);
+	
+			std::vector<InputStream*> inStreams04(NB_STREAMS);
+			std::vector<OutputStream*> outStreams04(NB_STREAMS);
+	
+			for (size_t i = 0; i < NB_STREAMS; i++)
+			{
+				inStreams01[i] = new InputStream01();
+				outStreams01[i] = new OutputStream01();
+				inStreams02[i] = new InputStream02();
+				outStreams02[i] = new OutputStream02();
+				inStreams03[i] = new InputStream03();
+				outStreams03[i] = new OutputStream03();
+				inStreams04[i] = new InputStream04();
+				outStreams04[i] = new OutputStream04();
+			}
+	#pragma endregion
+	
+			for (size_t i = 0; i < NB_TESTS; i++)
+			{
+				CreateFiles(NB_STREAMS);
+	
+				BenchmarkStream(inStreams01, outStreams01, chronos01, i, NB_STREAMS, BUFFER_SIZE, N);
+				BenchmarkStream(inStreams02, outStreams02, chronos02, i, NB_STREAMS, BUFFER_SIZE, N);
+				BenchmarkStream(inStreams03, outStreams03, chronos03, i, NB_STREAMS, BUFFER_SIZE, N);
+				//BenchmarkStream(inStreams04, outStreams04, chronos04, i, NB_STREAMS, BUFFER_SIZE, N);
+			}
+	
+			BenchmarkResultsToCSV(chronos01, chronos02, chronos03, chronos04, NB_STREAMS, BUFFER_SIZE, N, "TEST_N");
 		}
-
-		BenchmarkResultsToCSV(chronos01, chronos02, chronos03, chronos04, k, BUFFER_SIZE, NB_ELEMENTS, "TEST_K");
-	}
-#pragma endregion
-
-#pragma region Test_N
-	for (size_t N : N_values)
-	{
-#pragma region Chrono initialisation
-		Benchmarking* chronos01 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
-		Benchmarking* chronos02 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
-		Benchmarking* chronos03 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
-		Benchmarking* chronos04 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
-
-		for (size_t i = 0; i < NB_TESTS * NB_STREAMS; i++)
+	#pragma endregion
+	
+	#pragma region Test_B
+		for (size_t B : B_values)
 		{
-			chronos01[i] = Benchmarking();
-			chronos02[i] = Benchmarking();
-			chronos03[i] = Benchmarking();
-			chronos04[i] = Benchmarking();
+	#pragma region Chrono initialisation
+			Benchmarking* chronos03 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
+			Benchmarking* chronos04 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
+	
+			for (size_t i = 0; i < NB_TESTS * NB_STREAMS; i++)
+			{
+				chronos03[i] = Benchmarking();
+				chronos04[i] = Benchmarking();
+			}
+	#pragma endregion
+	
+	#pragma region Stream initialisation
+	
+			std::vector<InputStream*> inStreams03(NB_STREAMS);
+			std::vector<OutputStream*> outStreams03(NB_STREAMS);
+	
+			std::vector<InputStream*> inStreams04(NB_STREAMS);
+			std::vector<OutputStream*> outStreams04(NB_STREAMS);
+	
+			for (size_t i = 0; i < NB_STREAMS; i++)
+			{
+				inStreams03[i] = new InputStream03();
+				outStreams03[i] = new OutputStream03();
+				inStreams04[i] = new InputStream04();
+				outStreams04[i] = new OutputStream04();
+			}
+	#pragma endregion
+	
+			for (size_t i = 0; i < NB_TESTS; i++)
+			{
+				CreateFiles(NB_STREAMS);
+	
+				BenchmarkStream(inStreams03, outStreams03, chronos03, i, NB_STREAMS, B, NB_ELEMENTS);
+				//BenchmarkStream(inStreams04, outStreams04, chronos04, i, NB_STREAMS, B, NB_ELEMENTS);
+			}
+	
+			BenchmarkResultsToCSV(NULL, NULL, chronos03, chronos04, NB_STREAMS, B, NB_ELEMENTS, "TEST_B");
 		}
-#pragma endregion
-
-#pragma region Stream initialisation
-		std::vector<InputStream*> inStreams01(NB_STREAMS);
-		std::vector<OutputStream*> outStreams01(NB_STREAMS);
-
-		std::vector<InputStream*> inStreams02(NB_STREAMS);
-		std::vector<OutputStream*> outStreams02(NB_STREAMS);
-
-		std::vector<InputStream*> inStreams03(NB_STREAMS);
-		std::vector<OutputStream*> outStreams03(NB_STREAMS);
-
-		std::vector<InputStream*> inStreams04(NB_STREAMS);
-		std::vector<OutputStream*> outStreams04(NB_STREAMS);
-
-		for (size_t i = 0; i < NB_STREAMS; i++)
-		{
-			inStreams01[i] = new InputStream01();
-			outStreams01[i] = new OutputStream01();
-			inStreams02[i] = new InputStream02();
-			outStreams02[i] = new OutputStream02();
-			inStreams03[i] = new InputStream03();
-			outStreams03[i] = new OutputStream03();
-			inStreams04[i] = new InputStream04();
-			outStreams04[i] = new OutputStream04();
-		}
-#pragma endregion
-
-		for (size_t i = 0; i < NB_TESTS; i++)
-		{
-			CreateFiles(NB_STREAMS);
-
-			//BenchmarkStream(inStreams01, outStreams01, chronos01, i, NB_STREAMS, BUFFER_SIZE, N);
-			BenchmarkStream(inStreams02, outStreams02, chronos02, i, NB_STREAMS, BUFFER_SIZE, N);
-			BenchmarkStream(inStreams03, outStreams03, chronos03, i, NB_STREAMS, BUFFER_SIZE, N);
-			//BenchmarkStream(inStreams04, outStreams04, chronos04, i, NB_STREAMS, BUFFER_SIZE, N);
-		}
-
-		BenchmarkResultsToCSV(chronos01, chronos02, chronos03, chronos04, NB_STREAMS, BUFFER_SIZE, N, "TEST_N");
-	}
-#pragma endregion
-
-#pragma region Test_B
-	for (size_t B : B_values)
-	{
-#pragma region Chrono initialisation
-		Benchmarking* chronos03 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
-		Benchmarking* chronos04 = (Benchmarking*)malloc(sizeof(Benchmarking) * NB_TESTS * NB_STREAMS);
-
-		for (size_t i = 0; i < NB_TESTS * NB_STREAMS; i++)
-		{
-			chronos03[i] = Benchmarking();
-			chronos04[i] = Benchmarking();
-		}
-#pragma endregion
-
-#pragma region Stream initialisation
-
-		std::vector<InputStream*> inStreams03(NB_STREAMS);
-		std::vector<OutputStream*> outStreams03(NB_STREAMS);
-
-		std::vector<InputStream*> inStreams04(NB_STREAMS);
-		std::vector<OutputStream*> outStreams04(NB_STREAMS);
-
-		for (size_t i = 0; i < NB_STREAMS; i++)
-		{
-			inStreams03[i] = new InputStream03();
-			outStreams03[i] = new OutputStream03();
-			inStreams04[i] = new InputStream04();
-			outStreams04[i] = new OutputStream04();
-		}
-#pragma endregion
-
-		for (size_t i = 0; i < NB_TESTS; i++)
-		{
-			CreateFiles(NB_STREAMS);
-
-			BenchmarkStream(inStreams03, outStreams03, chronos03, i, NB_STREAMS, B, NB_ELEMENTS);
-			//BenchmarkStream(inStreams04, outStreams04, chronos04, i, NB_STREAMS, B, NB_ELEMENTS);
-		}
-
-		BenchmarkResultsToCSV(NULL, NULL, chronos03, chronos04, NB_STREAMS, B, NB_ELEMENTS, "TEST_B");
-	}
-#pragma endregion
-
-	testExternal();
+	#pragma endregion
+	
+		testExternal();
 
 
-	/*std::vector<std::string> streams = { filepathsRead[0] };
-	Multiway multiwayTest (streams);
-	multiwayTest.read(BUFFER_SIZE);
-	multiwayTest.merge();
-	multiwayTest.showRes();*/
-	//
+		/*std::vector<std::string> streams = { filepathsRead[0] };
+		Multiway multiwayTest (streams);
+		multiwayTest.read(BUFFER_SIZE);
+		multiwayTest.merge();
+		multiwayTest.showRes();*/
+		//
 
 	std::system("pause");
 	return 0;
@@ -294,7 +305,7 @@ void BenchmarkResultsToCSV(Benchmarking* chrono01, Benchmarking* chrono02, Bench
 	printf("\"Printing\" the results.\n");
 
 	std::fstream resultsFile;
-	
+
 	std::time_t current_time;
 	struct tm time_info;
 	time(&current_time);

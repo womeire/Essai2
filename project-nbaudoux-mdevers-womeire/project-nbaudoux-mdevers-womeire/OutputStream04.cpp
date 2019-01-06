@@ -15,7 +15,7 @@ OutputStream04::~OutputStream04()
 void OutputStream04::create(string filepath, size_t bufSize_32, size_t fileSize_8)
 {
 
-	std::random_device rd;
+	/*std::random_device rd;
 	std::default_random_engine generator(rd());
 	std::uniform_int_distribution<int32_t> distribution(0, std::numeric_limits<int32_t>::max());
 	int32_t value = distribution(generator);
@@ -23,7 +23,7 @@ void OutputStream04::create(string filepath, size_t bufSize_32, size_t fileSize_
 	_itoa_s(value, buf, 10);
 
 	filepath.append(buf);
-	filepath.append(".txt");
+	filepath.append(".txt");*/
 
 	bufferSize_8 = bufSize_32 * sizeof(int32_t); //bufSize is the size of the buffer in size int32_t, it's translated here to size 8b for easier use later (functions take 8b values)
 	strcpy_s(filepathChar, filepath.c_str());
