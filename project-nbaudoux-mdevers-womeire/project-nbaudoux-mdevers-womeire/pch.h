@@ -18,6 +18,7 @@
 #include <fstream> //fopen, fread, fwrite, ...
 #include <random> //random_engine
 #include <bitset>
+#include <thread>
 #include <stdio.h>
 #include <vector> //std::vector
 #include <queue> //std::priority_queue

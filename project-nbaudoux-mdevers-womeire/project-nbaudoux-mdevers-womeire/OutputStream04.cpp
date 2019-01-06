@@ -95,6 +95,7 @@ void OutputStream04::write_8(int8_t* elements_8)
 
 void OutputStream04::close()
 {
+	//std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 	currentPos_8 = 0;
 	//bi::file_mapping::remove(filepathChar);
 }
