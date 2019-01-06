@@ -22,7 +22,7 @@ const std::size_t NB_TESTS = 3;
 const std::size_t NB_STREAMS = 2;
 const std::size_t BUFFER_SIZE = 65536; //65536 = page_size of memory mapping
 // NB_ELEMENTS should not exceed capacity of size_t (= 4294967295)!
-const std::size_t NB_ELEMENTS = BUFFER_SIZE * sizeof(int32_t) * 2;
+const std::size_t NB_ELEMENTS = BUFFER_SIZE * sizeof(int32_t) * 10;
 const bool isRelease = false; // changes the folder where the testing is done
 
 string filepathsRead[30]; // 30 is the max NB_STREAMS should take
@@ -37,8 +37,8 @@ void testExternal();
 
 int main()
 {
-	size_t K_values[] = { 1, 2, 5, 10, 30}; // Our test system can go up to 512 simultaneous streams (but asked to do max 30)
-	size_t N_values[] = { 1, 1024, 1024 * 1024, 1024 * 1024 * 1024, 1024 * 1024 * 1024 * 3}; // Should not exceed capacity of size_t (= 4294967295)!
+	size_t K_values[] = { 1, 2, 5, 10/*, 30*/}; // Our test system can go up to 512 simultaneous streams (but asked to do max 30)
+	size_t N_values[] = {/* 1, 1024, 1024 * 1024, 1024 * 1024 * 1024,*/ 1024 * 1024 * 1024 * 3}; // Should not exceed capacity of size_t (= 4294967295)!
 	size_t B_values[] = { 1 , 1024, 65536, 1024 * 1024, 65536 * 100}; // Multiples of 65536 are good for stream04 as it's the page_size
 
 #pragma region Test_k
@@ -90,10 +90,10 @@ int main()
 		{
 			CreateFiles(k);
 
-			BenchmarkStream(inStreams01, outStreams01, chronos01, i, k, BUFFER_SIZE, NB_ELEMENTS);
-			BenchmarkStream(inStreams02, outStreams02, chronos02, i, k, BUFFER_SIZE, NB_ELEMENTS);
-			BenchmarkStream(inStreams03, outStreams03, chronos03, i, k, BUFFER_SIZE, NB_ELEMENTS);
-			//BenchmarkStream(inStreams04, outStreams04, chronos04, i, k, BUFFER_SIZE, NB_ELEMENTS);
+			//BenchmarkStream(inStreams01, outStreams01, chronos01, i, k, BUFFER_SIZE, NB_ELEMENTS);
+			//BenchmarkStream(inStreams02, outStreams02, chronos02, i, k, BUFFER_SIZE, NB_ELEMENTS);
+			//BenchmarkStream(inStreams03, outStreams03, chronos03, i, k, BUFFER_SIZE, NB_ELEMENTS);
+			BenchmarkStream(inStreams04, outStreams04, chronos04, i, k, BUFFER_SIZE, NB_ELEMENTS);
 		}
 
 		BenchmarkResultsToCSV(chronos01, chronos02, chronos03, chronos04, k, BUFFER_SIZE, NB_ELEMENTS, "TEST_K");
@@ -148,10 +148,10 @@ int main()
 		{
 			CreateFiles(NB_STREAMS);
 
-			BenchmarkStream(inStreams01, outStreams01, chronos01, i, NB_STREAMS, BUFFER_SIZE, N);
+			//BenchmarkStream(inStreams01, outStreams01, chronos01, i, NB_STREAMS, BUFFER_SIZE, N);
 			BenchmarkStream(inStreams02, outStreams02, chronos02, i, NB_STREAMS, BUFFER_SIZE, N);
 			BenchmarkStream(inStreams03, outStreams03, chronos03, i, NB_STREAMS, BUFFER_SIZE, N);
-			BenchmarkStream(inStreams04, outStreams04, chronos04, i, NB_STREAMS, BUFFER_SIZE, N);
+			//BenchmarkStream(inStreams04, outStreams04, chronos04, i, NB_STREAMS, BUFFER_SIZE, N);
 		}
 
 		BenchmarkResultsToCSV(chronos01, chronos02, chronos03, chronos04, NB_STREAMS, BUFFER_SIZE, N, "TEST_N");
@@ -194,7 +194,7 @@ int main()
 			CreateFiles(NB_STREAMS);
 
 			BenchmarkStream(inStreams03, outStreams03, chronos03, i, NB_STREAMS, B, NB_ELEMENTS);
-			BenchmarkStream(inStreams04, outStreams04, chronos04, i, NB_STREAMS, B, NB_ELEMENTS);
+			//BenchmarkStream(inStreams04, outStreams04, chronos04, i, NB_STREAMS, B, NB_ELEMENTS);
 		}
 
 		BenchmarkResultsToCSV(NULL, NULL, chronos03, chronos04, NB_STREAMS, B, NB_ELEMENTS, "TEST_B");
